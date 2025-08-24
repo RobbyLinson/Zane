@@ -1,0 +1,19 @@
+{
+  "name": "zane",
+  "version": "1.0.0",
+  "description": "A Cost Per Mille tool for fairness between brands and creators.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "concurrently": "^9.2.0"
+  }
+}
