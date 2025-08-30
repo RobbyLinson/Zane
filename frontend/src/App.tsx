@@ -1,21 +1,30 @@
 import React from "react";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { AuthPage } from "./pages/AuthPage";
+import { Dashboard } from "./pages/Dashboard";
+
+const AppContent: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return user ? <Dashboard /> : <AuthPage />;
+};
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="bg-white p-8 rounded-lg shadow-md">
-        <h1 className="text-2xl font-bold text-gray-800 mb-4">Zane</h1>
-        <p className="text-gray-600">Creator & Brand Marketplace</p>
-        <div className="mt-4 space-x-4">
-          <button className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-            Creator Login
-          </button>
-          <button className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Brand Login
-          </button>
-        </div>
-      </div>
-    </div>
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 }
 
