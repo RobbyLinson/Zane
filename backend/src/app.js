@@ -33,4 +33,6 @@ app.use("/api/auth", require("./routes/auth"));
 
 app.use("/api/contracts", require("./routes/contracts"));
 
+app.use("/api/campaigns", require("./routes/campaigns"));
+
 module.exports = app;

@@ -1,4 +1,4 @@
-import type { RegisterData, CreateContractData } from "../types";
+import type { RegisterData, CreateContractData, Campaign } from "../types";
 
 const API_BASE_URL = "http://localhost:5000/api";
 
@@ -94,6 +94,46 @@ class ApiService {
   async acceptContract(id: string) {
     return this.request(`/contracts/${id}/accept`, {
       method: "POST",
+    });
+  }
+
+  // Campaigns
+  async getMyCampaigns() {
+    // For creators and brands, backend filters by user type
+    return this.request("/campaigns");
+  }
+
+  async getBrandCampaigns() {
+    // Same endpoint, backend filters by user type
+    return this.request("/campaigns");
+  }
+
+  async getCampaign(id: string) {
+    return this.request(`/campaigns/${id}`);
+  }
+
+  async getCampaignsByUser(userId: string) {
+    return this.request(`/campaigns/user/${userId}`);
+  }
+
+  async createCampaign(contractId: string) {
+    // For creators to accept a contract and create a campaign
+    return this.request("/campaigns", {
+      method: "POST",
+      body: JSON.stringify({ contract_id: contractId }),
+    });
+  }
+
+  async updateCampaign(id: string, updates: Partial<Campaign>) {
+    return this.request(`/campaigns/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(updates),
+    });
+  }
+
+  async deleteCampaign(id: string) {
+    return this.request(`/campaigns/${id}`, {
+      method: "DELETE",
     });
   }
 
