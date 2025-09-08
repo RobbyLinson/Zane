@@ -31,4 +31,6 @@ app.get("/api/health", (req, res) => {
 // Auth routes
 app.use("/api/auth", require("./routes/auth"));
 
+app.use("/api/contracts", require("./routes/contracts"));
+
 module.exports = app;

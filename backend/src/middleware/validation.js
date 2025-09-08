@@ -1,4 +1,3 @@
-// backend/src/middleware/validation.js
 const validateRegistration = (req, res, next) => {
   const { email, password, first_name, last_name } = req.body;
   const errors = [];
