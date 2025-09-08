@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import type { RegisterData } from "../../services/api";
+import type { RegisterData } from "../../types";
 
 interface RegisterFormProps {
   onSwitchToLogin: () => void;
@@ -36,8 +36,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
     try {
       await register(formData);
-    } catch (err: any) {
-      setError(err.message || "Registration failed");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Failed to create contract");
+      }
     } finally {
       setLoading(false);
     }

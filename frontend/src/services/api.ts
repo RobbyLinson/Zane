@@ -1,3 +1,5 @@
+import type { RegisterData, CreateContractData } from "../types";
+
 const API_BASE_URL = "http://localhost:5000/api";
 
 class ApiService {
@@ -52,6 +54,49 @@ class ApiService {
     return this.request("/auth/profile");
   }
 
+  async getContracts(params?: {
+    status?: string;
+    platform?: string;
+    page?: number;
+    limit?: number;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined) {
+          searchParams.append(key, value.toString());
+        }
+      });
+    }
+
+    const query = searchParams.toString() ? `?${searchParams.toString()}` : "";
+    return this.request(`/contracts${query}`);
+  }
+
+  async getContract(id: string) {
+    return this.request(`/contracts/${id}`);
+  }
+
+  async createContract(contractData: CreateContractData) {
+    return this.request("/contracts", {
+      method: "POST",
+      body: JSON.stringify(contractData),
+    });
+  }
+
+  async updateContract(id: string, updates: Partial<CreateContractData>) {
+    return this.request(`/contracts/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(updates),
+    });
+  }
+
+  async acceptContract(id: string) {
+    return this.request(`/contracts/${id}/accept`, {
+      method: "POST",
+    });
+  }
+
   // Auth helpers
   saveToken(token: string) {
     localStorage.setItem("token", token);
@@ -64,26 +109,6 @@ class ApiService {
   getToken(): string | null {
     return localStorage.getItem("token");
   }
-}
-
-export interface RegisterData {
-  email: string;
-  password: string;
-  user_type: "creator" | "brand";
-  first_name: string;
-  last_name: string;
-  company_name?: string;
-}
-
-export interface User {
-  id: string;
-  email: string;
-  user_type: "creator" | "brand";
-  first_name: string;
-  last_name: string;
-  company_name?: string;
-  email_verified: boolean;
-  is_active: boolean;
 }
 
 export const api = new ApiService();

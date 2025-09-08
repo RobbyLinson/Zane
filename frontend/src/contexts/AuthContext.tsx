@@ -1,6 +1,7 @@
+/* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { api } from "../services/api";
-import type { RegisterData, User } from "../services/api";
+import type { RegisterData, User } from "../types";
 
 interface AuthContextType {
   user: User | null;
@@ -10,8 +11,6 @@ interface AuthContextType {
   logout: () => void;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
@@ -19,6 +18,8 @@ export const useAuth = () => {
   }
   return context;
 };
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
