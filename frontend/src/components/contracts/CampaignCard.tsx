@@ -22,6 +22,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
         setContract(res.contract);
       } catch (err) {
         setContract(null);
+        console.error("Failed to fetch contract", err);
       }
     };
     fetchContract();
