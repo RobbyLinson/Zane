@@ -42,17 +42,18 @@ const register = async (req, res) => {
 
     const userData = { email, first_name, last_name, user_type, company_name };
 
-    let stripe_id = createStripeAccount(userData);
+    let stripe_account_id = await createStripeAccount(userData);
 
     // Create user
+    console.log("Creating user with stripe_id:", stripe_account_id);
     const user = await User.create({
       email,
       password,
       user_type,
       first_name,
       last_name,
+      stripe_account_id,
       company_name: user_type === "brand" ? company_name : null,
-      stripe_id,
     });
 
     // Generate token

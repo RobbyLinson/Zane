@@ -34,13 +34,13 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
-    company_name: {
-      type: DataTypes.STRING,
-      allowNull: true, // Only for brands
-    },
     stripe_account_id: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    company_name: {
+      type: DataTypes.STRING,
+      allowNull: true, // Only for brands
     },
     email_verified: {
       type: DataTypes.BOOLEAN,
