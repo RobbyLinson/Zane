@@ -137,6 +137,10 @@ class ApiService {
     });
   }
 
+  async getStripeOnboardingLink() {
+    return this.request("/user/stripe-onboarding-link");
+  }
+
   // Auth helpers
   saveToken(token: string) {
     localStorage.setItem("token", token);
@@ -148,10 +152,6 @@ class ApiService {
 
   getToken(): string | null {
     return localStorage.getItem("token");
-  }
-
-  async getStripeOnboardingLink(): Promise<{ url?: string }> {
-    return this.request("/user/stripe-onboarding-link");
   }
 }
 
