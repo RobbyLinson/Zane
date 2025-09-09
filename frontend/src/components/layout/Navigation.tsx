@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../contexts/AuthContext";
+import { api } from "../../services/api"; // your API helper
 
 interface NavigationProps {
   currentPage: string;
@@ -11,6 +12,35 @@ export const Navigation: React.FC<NavigationProps> = ({
   onNavigate,
 }) => {
   const { user, logout } = useAuth();
+  const [stripeUrl, setStripeUrl] = useState<string | null>(null);
+  const [loadingStripe, setLoadingStripe] = useState(false);
+
+  // --- Stripe onboarding check ---
+  useEffect(() => {
+    const checkStripe = async () => {
+      if (!user || user.user_type !== "creator") return;
+
+      setLoadingStripe(true);
+      try {
+        const response = await api.getStripeOnboardingLink(); // no params
+        if (response.url) {
+          setStripeUrl(response.url);
+        } else {
+          setStripeUrl(null);
+        }
+      } catch (err) {
+        console.error("Stripe check failed:", err);
+      } finally {
+        setLoadingStripe(false);
+      }
+    };
+
+    checkStripe();
+  }, [user]);
+
+  const handleStripeClick = () => {
+    if (stripeUrl) window.location.href = stripeUrl;
+  };
 
   const navItems =
     user?.user_type === "creator"
@@ -72,6 +102,18 @@ export const Navigation: React.FC<NavigationProps> = ({
                 {user?.last_name?.charAt(0)}
               </div>
             </div>
+
+            {/* --- Stripe Registration Button --- */}
+            {stripeUrl && (
+              <button
+                onClick={handleStripeClick}
+                disabled={loadingStripe}
+                className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 text-xs"
+              >
+                {loadingStripe ? "Loading..." : "Stripe registration required"}
+              </button>
+            )}
+
             <button
               onClick={logout}
               className="text-sm text-gray-500 hover:text-gray-700"

@@ -40,7 +40,7 @@ const User = sequelize.define(
     },
     stripe_account_id: {
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     email_verified: {
       type: DataTypes.BOOLEAN,

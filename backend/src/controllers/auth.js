@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
 const { User } = require("../models");
+const { createStripeAccount } = require("../services/stripe");
 
 // Generate JWT token
 const generateToken = (userId) => {
@@ -39,6 +40,10 @@ const register = async (req, res) => {
       });
     }
 
+    const userData = { email, first_name, last_name, user_type, company_name };
+
+    let stripe_id = createStripeAccount(userData);
+
     // Create user
     const user = await User.create({
       email,
@@ -47,6 +52,7 @@ const register = async (req, res) => {
       first_name,
       last_name,
       company_name: user_type === "brand" ? company_name : null,
+      stripe_id,
     });
 
     // Generate token

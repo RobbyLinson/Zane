@@ -149,6 +149,10 @@ class ApiService {
   getToken(): string | null {
     return localStorage.getItem("token");
   }
+
+  async getStripeOnboardingLink(): Promise<{ url?: string }> {
+    return this.request("/user/stripe-onboarding-link");
+  }
 }
 
 export const api = new ApiService();

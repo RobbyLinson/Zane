@@ -37,6 +37,11 @@ const Payout = sequelize.define(
       type: DataTypes.TEXT,
       allowNull: true,
     },
+    currency: {
+      type: DataTypes.STRING(3),
+      allowNull: false,
+      defaultValue: "USD",
+    },
   },
   {
     tableName: "payouts",
