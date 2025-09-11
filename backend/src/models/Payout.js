@@ -17,6 +17,14 @@ const Payout = sequelize.define(
         key: "id",
       },
     },
+    campaign_id: {
+      type: DataTypes.UUID,
+      allowNull: true, // Keep your existing structure
+      references: {
+        model: "campaigns",
+        key: "id",
+      },
+    },
     amount: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,

@@ -51,6 +51,11 @@ const Campaign = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    content_approved: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+      comment: "Whether brand approved the content",
+    },
     last_tracked_at: {
       type: DataTypes.DATE,
       allowNull: true,

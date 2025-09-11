@@ -4,6 +4,7 @@ import { AuthPage } from "./pages/AuthPage";
 import { Dashboard } from "./pages/Dashboard";
 import { Contracts } from "./pages/Contracts";
 import { Campaigns } from "./pages/Campaigns";
+import { Payouts } from "./pages/Payouts";
 import { Navigation } from "./components/layout/Navigation";
 
 const AppContent: React.FC = () => {
@@ -35,18 +36,7 @@ const AppContent: React.FC = () => {
         return <Campaigns />;
       case "earnings":
       case "payouts":
-        return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
-                Coming Soon
-              </h2>
-              <p className="text-gray-600">
-                This feature will be available soon!
-              </p>
-            </div>
-          </div>
-        );
+        return <Payouts />;
       default:
         return <Dashboard onNavigate={setCurrentPage} />;
     }
