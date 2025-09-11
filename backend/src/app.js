@@ -37,4 +37,6 @@ app.use("/api/campaigns", require("./routes/campaigns"));
 
 app.use("/api/user", require("./routes/user"));
 
+app.use("/api/payments", require("./routes/payments"));
+
 module.exports = app;
