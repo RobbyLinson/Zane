@@ -78,4 +78,5 @@ export interface CreateContractData {
   content_requirements?: string;
   platform?: "tiktok" | "instagram" | "youtube_shorts";
   expires_at?: string;
+  company_charge: number;
 }
