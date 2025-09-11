@@ -1,40 +1,46 @@
+// services/PaymentService.js
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const Campaign = require("../models/Campaign");
+const Contract = require("../models/Contract");
+const Payout = require("../models/Payout");
+const User = require("../models/User"); // assuming you have a User model
+
 class PaymentService {
   constructor() {
-    this.platformFeeRate = 0.2; // 10% platform fee
+    this.platformFeeRate = 0.2;
   }
 
   /**
-   * Step 1: Create campaign funding (escrow)
+   * Step 1: Fund a contract (escrow)
+   * Uses Contract.max_payout as the amount.
    */
-  async fundCampaign(campaignId, brandStripeAccountId = null) {
-    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+  async fundContract(contractId, brandStripeAccountId = null) {
+    const contract = await Contract.findByPk(contractId);
 
-    const campaign = await Campaign.findByPk(campaignId, {
-      include: [{ model: User, as: "creator" }],
-    });
-
-    if (!campaign) {
-      throw new Error("Campaign not found");
+    if (!contract) {
+      throw new Error("Contract not found");
     }
 
-    // Create payment intent to hold brand funds
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(parseFloat(campaign.budget_amount) * 100), // Convert to cents
+      amount: Math.round(parseFloat(contract.max_payout) * 100),
       currency: "usd",
       metadata: {
-        campaign_id: campaignId,
-        type: "campaign_funding",
+        contract_id: contractId,
+        type: "contract_funding",
       },
     });
 
-    // Update campaign with payment info
-    await campaign.update({
+    // Store payment intent in a Payout record for tracking escrow
+    const payout = await Payout.create({
+      user_id: contract.brand_id,
+      campaign_id: null,
+      amount: contract.max_payout,
       stripe_payment_intent_id: paymentIntent.id,
-      budget_status: "pending",
+      status: "pending",
     });
 
     return {
-      campaign,
+      payout,
       paymentIntent: {
         id: paymentIntent.id,
         client_secret: paymentIntent.client_secret,
@@ -43,47 +49,51 @@ class PaymentService {
   }
 
   /**
-   * Step 2: Confirm funding
+   * Step 2: Confirm campaign funding
    */
   async confirmCampaignFunding(campaignId) {
-    const campaign = await Campaign.findByPk(campaignId);
-
-    await campaign.update({
-      budget_status: "funded",
-      funded_at: new Date(),
-      tracking_start_date: new Date(),
-    });
-
-    return campaign;
-  }
-
-  /**
-   * Step 3: Calculate payout based on current views
-   */
-  async calculatePayout(campaignId) {
     const campaign = await Campaign.findByPk(campaignId);
 
     if (!campaign) {
       throw new Error("Campaign not found");
     }
 
-    const viewCount = parseInt(campaign.current_views);
-    const cpmRate = parseFloat(campaign.cpm_rate);
+    await campaign.update({
+      status: "tracking",
+      last_tracked_at: new Date(),
+    });
 
-    // Calculate gross earnings: (views / 1000) * CPM rate
+    return campaign;
+  }
+
+  /**
+   * Step 3: Calculate payout based on views
+   */
+  async calculatePayout(campaignId) {
+    const campaign = await Campaign.findByPk(campaignId, {
+      include: [{ model: Contract, as: "contract" }],
+    });
+
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
+    if (!campaign.contract) {
+      throw new Error("Campaign missing contract");
+    }
+
+    const viewCount = parseInt(campaign.views_tracked);
+    const cpmRate = parseFloat(campaign.contract.cpm_rate);
+    const maxPayout = parseFloat(campaign.contract.max_payout);
+
+    // gross earnings = (views / 1000) * CPM
     const grossEarnings = (viewCount / 1000) * cpmRate;
+    const cappedEarnings = Math.min(grossEarnings, maxPayout);
 
-    // Apply budget cap
-    const budgetAmount = parseFloat(campaign.budget_amount);
-    const cappedEarnings = Math.min(grossEarnings, budgetAmount);
-
-    // Calculate platform fee
     const platformFee = cappedEarnings * this.platformFeeRate;
     const netEarnings = cappedEarnings - platformFee;
 
-    // Calculate amount due (total earned - already paid)
-    const totalPaidOut = parseFloat(campaign.total_paid_out);
-    const amountDue = Math.max(0, netEarnings - totalPaidOut);
+    const alreadyEarned = parseFloat(campaign.amount_earned);
+    const amountDue = Math.max(0, netEarnings - alreadyEarned);
 
     return {
       viewCount,
@@ -91,19 +101,26 @@ class PaymentService {
       cappedEarnings,
       platformFee,
       netEarnings,
-      totalPaidOut,
+      alreadyEarned,
       amountDue,
       cpmRate,
     };
   }
 
   /**
-   * Step 4: Create and process payout
+   * Step 4: Create payout record
    */
   async createPayout(campaignId) {
     const campaign = await Campaign.findByPk(campaignId, {
-      include: [{ model: User, as: "creator" }],
+      include: [
+        { model: User, as: "creator" },
+        { model: Contract, as: "contract" },
+      ],
     });
+
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
 
     const calculation = await this.calculatePayout(campaignId);
 
@@ -111,38 +128,32 @@ class PaymentService {
       throw new Error("No payout due");
     }
 
-    // Create payout record
     const payout = await Payout.create({
-      user_id: campaign.creator.id,
+      user_id: campaign.creator_id,
       campaign_id: campaignId,
       amount: calculation.amountDue,
-      platform_fee: calculation.amountDue * this.platformFeeRate,
-      net_amount: calculation.amountDue * (1 - this.platformFeeRate),
-      views_at_payout: calculation.viewCount,
-      cmp_rate_used: calculation.cpmRate,
       status: "pending",
+      currency: "USD",
     });
 
-    // Update campaign totals
     await campaign.update({
-      total_earned: calculation.netEarnings,
-      total_paid_out:
-        parseFloat(campaign.total_paid_out) + calculation.amountDue,
+      amount_earned: calculation.netEarnings,
     });
 
     return { payout, calculation };
   }
 
   /**
-   * Step 5: Process actual Stripe transfer
+   * Step 5: Process Stripe transfer to creator
    */
   async processPayout(payoutId) {
-    const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
-
     const payout = await Payout.findByPk(payoutId, {
       include: [{ model: User, as: "user" }],
     });
 
+    if (!payout) {
+      throw new Error("Payout not found");
+    }
     if (!payout.user.stripe_connect_account_id) {
       throw new Error("Creator has no Stripe Connect account");
     }
@@ -152,14 +163,13 @@ class PaymentService {
 
     try {
       const transfer = await stripe.transfers.create({
-        amount: Math.round(parseFloat(payout.net_amount) * 100),
-        currency: "usd",
+        amount: Math.round(parseFloat(payout.amount) * 100),
+        currency: payout.currency,
         destination: payout.user.stripe_connect_account_id,
       });
 
       await payout.update({
         status: "completed",
-        stripe_transfer_id: transfer.id,
         processed_at: new Date(),
       });
 
@@ -174,18 +184,22 @@ class PaymentService {
   }
 
   /**
-   * Update view count (manual for now)
+   * Step 6: Update campaign views
    */
   async updateViews(campaignId, newViewCount) {
     const campaign = await Campaign.findByPk(campaignId);
 
+    if (!campaign) {
+      throw new Error("Campaign not found");
+    }
+
     await campaign.update({
-      current_views: newViewCount,
-      last_view_update: new Date(),
+      views_tracked: newViewCount,
+      last_tracked_at: new Date(),
     });
 
     return campaign;
   }
 }
 
-module.exports = { Campaign, Payout, PaymentService: new PaymentService() };
+module.exports = new PaymentService();
