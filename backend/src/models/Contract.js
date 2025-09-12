@@ -49,6 +49,10 @@ const Contract = sequelize.define(
       type: DataTypes.ENUM("tiktok", "instagram", "youtube_shorts"),
       defaultValue: "tiktok",
     },
+    company_charge: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("active", "paused", "completed", "cancelled"),
       defaultValue: "active",

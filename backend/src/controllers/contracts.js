@@ -40,6 +40,7 @@ const createContract = async (req, res) => {
       target_audience,
       content_requirements,
       platform: platform || "tiktok",
+      company_charge,
       expires_at: expires_at ? new Date(expires_at) : null,
     });
 

@@ -1,18 +1,17 @@
-// services/PaymentService.js
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 const Campaign = require("../models/Campaign");
 const Contract = require("../models/Contract");
 const Payout = require("../models/Payout");
-const User = require("../models/User"); // assuming you have a User model
+const User = require("../models/User");
 
 class PaymentService {
   constructor() {
-    this.platformFeeRate = 0.2;
+    this.platformFeeRate = parseFloat(process.env.PLATFORM_FEE_RATE) || 0.2;
   }
 
   /**
    * Step 1: Fund a contract (escrow)
-   * Uses Contract.max_payout as the amount.
+   * Charge company_charge, set aside max_payout for creator.
    */
   async fundContract(contractId, brandStripeAccountId = null) {
     const contract = await Contract.findByPk(contractId);
@@ -21,8 +20,13 @@ class PaymentService {
       throw new Error("Contract not found");
     }
 
+    const companyCharge = parseFloat(contract.company_charge);
+    const platformFee = companyCharge * this.platformFeeRate;
+    const maxPayout = companyCharge - platformFee;
+
+    // Charge the company the full contract charge
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(parseFloat(contract.max_payout) * 100),
+      amount: Math.round(companyCharge * 100),
       currency: "usd",
       metadata: {
         contract_id: contractId,
@@ -30,13 +34,15 @@ class PaymentService {
       },
     });
 
-    // Store payment intent in a Payout record for tracking escrow
+    // Store payment intent and escrow info in a Payout record
     const payout = await Payout.create({
       user_id: contract.brand_id,
       campaign_id: null,
-      amount: contract.max_payout,
+      amount: maxPayout,
       stripe_payment_intent_id: paymentIntent.id,
       status: "pending",
+      platform_fee: platformFee,
+      currency: "USD",
     });
 
     return {
@@ -45,6 +51,8 @@ class PaymentService {
         id: paymentIntent.id,
         client_secret: paymentIntent.client_secret,
       },
+      platformFee,
+      maxPayout,
     };
   }
 
@@ -68,6 +76,7 @@ class PaymentService {
 
   /**
    * Step 3: Calculate payout based on views
+   * Creator can earn up to max_payout, platform fee already taken.
    */
   async calculatePayout(campaignId) {
     const campaign = await Campaign.findByPk(campaignId, {
@@ -83,27 +92,27 @@ class PaymentService {
 
     const viewCount = parseInt(campaign.views_tracked);
     const cpmRate = parseFloat(campaign.contract.cpm_rate);
-    const maxPayout = parseFloat(campaign.contract.max_payout);
+    const companyCharge = parseFloat(campaign.contract.company_charge);
+    const platformFee = companyCharge * this.platformFeeRate;
+    const maxPayout = companyCharge - platformFee;
 
     // gross earnings = (views / 1000) * CPM
     const grossEarnings = (viewCount / 1000) * cpmRate;
     const cappedEarnings = Math.min(grossEarnings, maxPayout);
 
-    const platformFee = cappedEarnings * this.platformFeeRate;
-    const netEarnings = cappedEarnings - platformFee;
-
     const alreadyEarned = parseFloat(campaign.amount_earned);
-    const amountDue = Math.max(0, netEarnings - alreadyEarned);
+    const amountDue = Math.max(0, cappedEarnings - alreadyEarned);
 
     return {
       viewCount,
       grossEarnings,
       cappedEarnings,
-      platformFee,
-      netEarnings,
       alreadyEarned,
       amountDue,
       cpmRate,
+      maxPayout,
+      companyCharge,
+      platformFee,
     };
   }
 
@@ -137,7 +146,7 @@ class PaymentService {
     });
 
     await campaign.update({
-      amount_earned: calculation.netEarnings,
+      amount_earned: parseFloat(campaign.amount_earned) + calculation.amountDue,
     });
 
     return { payout, calculation };

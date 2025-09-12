@@ -7,6 +7,18 @@ interface CreateContractFormProps {
   onCancel: () => void;
 }
 
+async function fundContract(contractId: string) {
+  const response = await fetch(`/api/payments/fund/${contractId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+  });
+  const data = await response.json();
+  return data;
+}
+
 export const CreateContractForm: React.FC<CreateContractFormProps> = ({
   onSuccess,
   onCancel,
@@ -15,12 +27,12 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     title: "",
     description: "",
     cpm_rate: 5.0,
-    max_payout: 500.0,
+    max_payout: 400.0,
     min_views: 1000,
     target_audience: "",
     content_requirements: "",
     platform: "tiktok",
-    company_charge: 8000,
+    company_charge: 500.0,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
