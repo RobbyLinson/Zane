@@ -25,7 +25,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       setLoadingStripe(true);
       try {
         const response = await api.getStripeOnboardingLink();
-        console.log("Stripe API Response:", response); // Add this line
+        console.log("Stripe API Response:", response);
         if (response.url) {
           setStripeUrl(response.url);
         } else {

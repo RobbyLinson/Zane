@@ -1,22 +1,38 @@
-const { generateStripeOnboardingLink } = require("../services/stripe");
+const Stripe = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { User } = require("../models");
+const { generateStripeOnboardingLink } = require("../services/stripe");
 
 const getStripeOnboardingLink = async (req, res) => {
-  const user = await User.findByPk(req.user.userId);
-  console.log("Generating Stripe onboarding link for user:", user);
-  if (user.user_type !== "creator") {
-    return res
-      .status(403)
-      .json({ error: "Only creators need Stripe onboarding" });
-  }
-
   try {
-    const url = await generateStripeOnboardingLink(
-      user.stripe_account_id,
-      `${process.env.FRONTEND_URL}/stripe/refresh`,
-      `${process.env.FRONTEND_URL}/stripe/complete`
-    );
-    res.json({ url });
+    const user = await User.findByPk(req.user.userId);
+    console.log("Generating Stripe onboarding link for user:", user);
+    if (user.user_type !== "creator") {
+      return res
+        .status(403)
+        .json({ error: "Only creators need Stripe onboarding" });
+    }
+
+    // Fetch the account status from Stripe
+    const account = await stripe.accounts.retrieve(user.stripe_account_id);
+
+    // If onboarding already complete, don’t return a new link
+    if (account.details_submitted && account.charges_enabled) {
+      return res.json({
+        url: null,
+        message: "Stripe account already onboarded",
+      });
+    }
+
+    // Otherwise, generate a fresh onboarding link
+    const accountLink = await generateStripeOnboardingLink({
+      account: user.stripe_account_id,
+      refresh_url: `${process.env.FRONTEND_URL}/stripe/refresh`,
+      return_url: `${process.env.FRONTEND_URL}/stripe/complete`,
+      type: "account_onboarding",
+    });
+
+    return res.json({ url: accountLink.url });
   } catch (err) {
     console.error("Stripe onboarding link error:", err);
     res
