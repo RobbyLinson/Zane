@@ -13,40 +13,28 @@ class PaymentService {
    * Step 1: Fund a contract (escrow)
    * Charge company_charge, set aside max_payout for creator.
    */
-  async fundContract(contractId, brandStripeAccountId = null) {
-    const contract = await Contract.findByPk(contractId);
-
-    if (!contract) {
-      throw new Error("Contract not found");
+  async fundContractDraft(contractDraft, brandId) {
+    const companyCharge = parseFloat(contractDraft.company_charge);
+    if (!companyCharge || companyCharge <= 0) {
+      throw new Error("Invalid company charge");
     }
-
-    const companyCharge = parseFloat(contract.company_charge);
     const platformFee = companyCharge * this.platformFeeRate;
     const maxPayout = companyCharge - platformFee;
 
-    // Charge the company the full contract charge
+    // Create PaymentIntent for the full contract charge
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(companyCharge * 100),
-      currency: "usd",
+      currency: "eur",
       metadata: {
-        contract_id: contractId,
-        type: "contract_funding",
+        type: "contract_funding_draft",
+        brand_id: brandId,
+        title: contractDraft.title,
       },
     });
 
-    // Store payment intent and escrow info in a Payout record
-    const payout = await Payout.create({
-      user_id: contract.brand_id,
-      campaign_id: null,
-      amount: maxPayout,
-      stripe_payment_intent_id: paymentIntent.id,
-      status: "pending",
-      platform_fee: platformFee,
-      currency: "USD",
-    });
+    // Optionally: Store a temporary record if you want to track drafts
 
     return {
-      payout,
       paymentIntent: {
         id: paymentIntent.id,
         client_secret: paymentIntent.client_secret,

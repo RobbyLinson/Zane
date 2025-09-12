@@ -1,41 +1,41 @@
 const express = require("express");
 const router = express.Router();
-const paymentController = require("../controllers/payments");
+const paymentsController = require("../controllers/payments");
 const { authenticateToken } = require("../middleware/auth");
 
 // Brand funds a contract
 router.post(
-  "/fund/:contractId",
+  "/contracts/fund-draft",
   authenticateToken,
-  paymentController.fundContract
+  paymentsController.fundContractDraft
 );
 
 // Confirm campaign funding
 router.post(
   "/campaign/:campaignId/confirm",
   authenticateToken,
-  paymentController.confirmCampaignFunding
+  paymentsController.confirmCampaignFunding
 );
 
 // Update campaign views
 router.post(
   "/campaign/:campaignId/views",
   authenticateToken,
-  paymentController.updateViews
+  paymentsController.updateViews
 );
 
 // Create payout
 router.post(
   "/campaign/:campaignId/payout",
   authenticateToken,
-  paymentController.createPayout
+  paymentsController.createPayout
 );
 
 // Process payout
 router.post(
   "/payout/:payoutId/process",
   authenticateToken,
-  paymentController.processPayout
+  paymentsController.processPayout
 );
 
 module.exports = router;

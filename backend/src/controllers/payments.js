@@ -1,9 +1,12 @@
 const PaymentService = require("../services/payment");
 
-exports.fundContract = async (req, res) => {
+exports.fundContractDraft = async (req, res) => {
   try {
-    const { contractId } = req.params;
-    const result = await PaymentService.fundContract(contractId);
+    const contractDraft = req.body; // All contract fields
+    const result = await PaymentService.fundContractDraft(
+      contractDraft,
+      req.user.userId
+    );
     res.json(result);
   } catch (err) {
     res.status(400).json({ error: err.message });

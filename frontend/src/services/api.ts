@@ -136,6 +136,12 @@ class ApiService {
       method: "DELETE",
     });
   }
+  async fundDraft(contractDraft: CreateContractData) {
+    return this.request("/contracts/fund-draft", {
+      method: "POST",
+      body: JSON.stringify(contractDraft),
+    });
+  }
 
   async getStripeOnboardingLink() {
     return this.request("/user/stripe-onboarding-link");
