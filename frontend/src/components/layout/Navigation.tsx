@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useAuth } from "../../contexts/AuthContext";
-import { api } from "../../services/api"; // your API helper
+import { api } from "../../services/api";
 
 interface NavigationProps {
   currentPage: string;
