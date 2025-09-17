@@ -137,7 +137,7 @@ class ApiService {
     });
   }
   async fundDraft(contractDraft: CreateContractData) {
-    return this.request("/contracts/fund-draft", {
+    return this.request("/payments/contracts/fund-draft", {
       method: "POST",
       body: JSON.stringify(contractDraft),
     });

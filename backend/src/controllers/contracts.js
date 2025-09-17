@@ -13,6 +13,7 @@ const createContract = async (req, res) => {
       target_audience,
       content_requirements,
       platform,
+      company_charge,
       expires_at,
     } = req.body;
 

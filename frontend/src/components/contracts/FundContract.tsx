@@ -28,7 +28,9 @@ export function FundContractForm({
       // Call backend to create PaymentIntent for this contract draft
       const res = await api.fundDraft(contractDraft);
 
-      const { paymentIntent, error } = await res.json();
+      console.log("Fund draft response:", res);
+
+      const { paymentIntent, error } = await res;
       if (error) throw new Error(error);
 
       // Confirm payment with card details

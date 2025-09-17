@@ -21,10 +21,19 @@ class PaymentService {
     const platformFee = companyCharge * this.platformFeeRate;
     const maxPayout = companyCharge - platformFee;
 
+    const user = await User.findByPk(brandId);
+
+    const stripeCustomerId = user.stripe_account_id;
+
+    console.log("Customer ID:", stripeCustomerId);
+    if (!stripeCustomerId) {
+      throw new Error("Brand has no Stripe customer ID");
+    }
     // Create PaymentIntent for the full contract charge
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(companyCharge * 100),
       currency: "eur",
+      customer: stripeCustomerId,
       metadata: {
         type: "contract_funding_draft",
         brand_id: brandId,
