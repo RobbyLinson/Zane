@@ -145,6 +145,36 @@ const getCampaignsByUser = async (req, res) => {
   }
 };
 
+const getMaxPayout = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // fetch campaigns with contracts
+    const campaigns = await Campaign.findAll({
+      where: { creator_id: userId },
+      include: [
+        {
+          model: Contract,
+          as: "contract",
+          attributes: ["max_payout"],
+        },
+      ],
+    });
+
+    // sum all contract.max_payout values
+    const totalMaxPayout = campaigns.reduce((sum, campaign) => {
+      const payout = campaign.contract?.max_payout
+        ? parseFloat(campaign.contract.max_payout)
+        : 0;
+      return sum + payout;
+    }, 0);
+    console.log("Max Payout fetched:", totalMaxPayout);
+    res.json({ totalMaxPayout });
+  } catch (error) {
+    console.error("Get max payout for user error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
 module.exports = {
   createCampaign,
   getCampaigns,
@@ -152,4 +182,5 @@ module.exports = {
   updateCampaign,
   deleteCampaign,
   getCampaignsByUser,
+  getMaxPayout,
 };

@@ -1,15 +1,30 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { api } from "../services/api";
 
 export const Payouts: React.FC = () => {
-  // Mock data; replace with real API data in production
-  const [maxPayout] = useState(1200.0); // Maximum possible earnings
-  const [currentEarnings, setCurrentEarnings] = useState(450.0); // Already earned
+  const [maxPayout, setMaxPayout] = useState<number>(0);
+  const [currentEarnings, setCurrentEarnings] = useState(450.0); // Replace with real data
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
 
+  // Replace this with your actual user ID logic
+  const userId = localStorage.getItem("userId") || "currentUserId";
+
+  useEffect(() => {
+    const fetchMaxPayout = async () => {
+      try {
+        const response = await api.getMaxPayout();
+        setMaxPayout(response.totalMaxPayout || 0);
+      } catch (err) {
+        setMaxPayout(0);
+        console.error("Failed to load max payout:", err);
+      }
+    };
+    fetchMaxPayout();
+  }, [userId]);
+
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
-    // Simulate API call
     setTimeout(() => {
       setWithdrawn(true);
       setIsWithdrawing(false);
