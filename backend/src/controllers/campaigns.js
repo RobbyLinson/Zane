@@ -175,6 +175,35 @@ const getMaxPayout = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
+const getCurrentPayout = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    const campaigns = await Campaign.findAll({
+      where: { creator_id: userId },
+      include: [
+        {
+          model: Contract,
+          as: "contract",
+          attributes: ["cpm_rate"], // need this for the virtual getter
+        },
+      ],
+    });
+
+    const totalCurrentPayout = campaigns.reduce((sum, campaign) => {
+      const payout = campaign.amount_earned
+        ? parseFloat(campaign.amount_earned)
+        : 0;
+      return sum + payout;
+    }, 0);
+
+    res.json({ totalCurrentPayout });
+  } catch (error) {
+    console.error("Get current payout for user error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   createCampaign,
   getCampaigns,
@@ -183,4 +212,5 @@ module.exports = {
   deleteCampaign,
   getCampaignsByUser,
   getMaxPayout,
+  getCurrentPayout,
 };

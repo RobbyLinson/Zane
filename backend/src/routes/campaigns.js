@@ -7,6 +7,7 @@ const {
   deleteCampaign,
   getCampaignsByUser,
   getMaxPayout,
+  getCurrentPayout,
 } = require("../controllers/campaigns");
 const { authenticateToken, requireUserType } = require("../middleware/auth");
 
@@ -18,6 +19,7 @@ router.post("/", requireUserType("creator"), createCampaign);
 router.get("/", getCampaigns);
 router.get("/user/:userId", getCampaignsByUser);
 router.get("/max-payout", getMaxPayout);
+router.get("/current-payout", getCurrentPayout);
 router.get("/:id", getCampaign);
 router.put("/:id", requireUserType("creator"), updateCampaign);
 router.delete("/:id", requireUserType("creator"), deleteCampaign);

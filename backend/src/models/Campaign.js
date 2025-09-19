@@ -34,8 +34,13 @@ const Campaign = sequelize.define(
       defaultValue: 0,
     },
     amount_earned: {
-      type: DataTypes.DECIMAL(10, 2),
-      defaultValue: 0.0,
+      type: DataTypes.VIRTUAL,
+      get() {
+        const views = this.getDataValue("views_tracked") || 0;
+        const contract = this.get("contract"); // must include in query
+        const cpm = contract?.cpm_rate ? parseFloat(contract.cpm_rate) : 0;
+        return ((views / 1000) * cpm).toFixed(2);
+      },
     },
     status: {
       type: DataTypes.ENUM(

@@ -120,6 +120,10 @@ class ApiService {
     return this.request(`/campaigns/max-payout`);
   }
 
+  async getCurrentPayout() {
+    return this.request(`/campaigns/current-payout`);
+  }
+
   async createCampaign(contractId: string) {
     // For creators to accept a contract and create a campaign
     return this.request("/campaigns", {

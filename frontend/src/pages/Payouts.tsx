@@ -3,7 +3,7 @@ import { api } from "../services/api";
 
 export const Payouts: React.FC = () => {
   const [maxPayout, setMaxPayout] = useState<number>(0);
-  const [currentEarnings, setCurrentEarnings] = useState(450.0); // Replace with real data
+  const [currentPayout, setCurrentPayout] = useState<number>(0);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
 
@@ -20,7 +20,17 @@ export const Payouts: React.FC = () => {
         console.error("Failed to load max payout:", err);
       }
     };
+    const fetchCurrentPayout = async () => {
+      try {
+        const response = await api.getCurrentPayout();
+        setCurrentPayout(response.totalCurrentPayout || 0);
+      } catch (err) {
+        setCurrentPayout(0);
+        console.error("Failed to load max payout:", err);
+      }
+    };
     fetchMaxPayout();
+    fetchCurrentPayout();
   }, [userId]);
 
   const handleWithdraw = async () => {
@@ -28,7 +38,6 @@ export const Payouts: React.FC = () => {
     setTimeout(() => {
       setWithdrawn(true);
       setIsWithdrawing(false);
-      setCurrentEarnings(0);
     }, 1500);
   };
 
@@ -45,16 +54,16 @@ export const Payouts: React.FC = () => {
         <div className="flex justify-between items-center mb-4">
           <span className="text-gray-600">Currently Available:</span>
           <span className="text-lg font-semibold text-blue-700">
-            ${currentEarnings.toFixed(2)}
+            ${currentPayout.toFixed(2)}
           </span>
         </div>
         <button
           className={`w-full py-2 mt-4 rounded text-white font-semibold transition ${
-            currentEarnings > 0 && !withdrawn
+            currentPayout > 0 && !withdrawn
               ? "bg-blue-600 hover:bg-blue-700"
               : "bg-gray-400 cursor-not-allowed"
           }`}
-          disabled={currentEarnings === 0 || isWithdrawing || withdrawn}
+          disabled={currentPayout === 0 || isWithdrawing || withdrawn}
           onClick={handleWithdraw}
         >
           {isWithdrawing
