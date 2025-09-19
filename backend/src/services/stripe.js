@@ -45,7 +45,9 @@ async function generateStripeOnboardingLink(
     type: "account_onboarding",
   });
 
-  return accountLink.url;
+  console.log("Generated Stripe account link:", accountLink);
+
+  return accountLink;
 }
 
 module.exports = { createStripeAccount, generateStripeOnboardingLink };
