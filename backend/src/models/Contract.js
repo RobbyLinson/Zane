@@ -53,6 +53,11 @@ const Contract = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: false,
     },
+    num_campaigns: {
+      type: DataTypes.INTEGER,
+      defaultValue: 1,
+      allowNull: false,
+    },
     status: {
       type: DataTypes.ENUM("active", "paused", "completed", "cancelled"),
       defaultValue: "active",

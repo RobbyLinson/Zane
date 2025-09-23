@@ -156,7 +156,7 @@ const getMaxPayout = async (req, res) => {
         {
           model: Contract,
           as: "contract",
-          attributes: ["max_payout"],
+          attributes: ["max_payout", "amount_withdrawn"],
         },
       ],
     });
@@ -164,7 +164,9 @@ const getMaxPayout = async (req, res) => {
     // sum all contract.max_payout values
     const totalMaxPayout = campaigns.reduce((sum, campaign) => {
       const payout = campaign.contract?.max_payout
-        ? parseFloat(campaign.contract.max_payout)
+        ? parseFloat(
+            campaign.contract.max_payout - campaign.contract.amount_withdrawn
+          )
         : 0;
       return sum + payout;
     }, 0);
@@ -192,7 +194,9 @@ const getCurrentPayout = async (req, res) => {
 
     const totalCurrentPayout = campaigns.reduce((sum, campaign) => {
       const payout = campaign.amount_earned
-        ? parseFloat(campaign.amount_earned)
+        ? parseFloat(
+            campaign.amount_earned - campaign.contract.amount_withdrawn
+          )
         : 0;
       return sum + payout;
     }, 0);

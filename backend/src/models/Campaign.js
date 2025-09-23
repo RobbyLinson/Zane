@@ -65,6 +65,20 @@ const Campaign = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
+    max_payout: {
+      type: DataTypes.VIRTUAL,
+      get() {
+        const contract = this.get("contract"); // must include in query
+        return contract?.max_payout
+          ? parseFloat(contract.max_payout) / contract.num_campaigns
+          : 0;
+      },
+    },
+    amount_withdrawn: {
+      type: DataTypes.DECIMAL(10, 2),
+      defaultValue: 0.0,
+      allowNull: false,
+    },
   },
   {
     tableName: "campaigns",
