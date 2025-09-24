@@ -24,6 +24,7 @@ const createCampaign = async (req, res) => {
       contract_id,
       creator_id,
       status: "accepted",
+      max_payout: contract.max_payout / contract.num_campaigns,
     });
 
     res.status(201).json({ campaign });
@@ -148,59 +149,29 @@ const getCampaignsByUser = async (req, res) => {
 const getMaxPayout = async (req, res) => {
   try {
     const userId = req.user.userId;
-
-    // fetch campaigns with contracts
     const campaigns = await Campaign.findAll({
       where: { creator_id: userId },
-      include: [
-        {
-          model: Contract,
-          as: "contract",
-          attributes: ["max_payout", "amount_withdrawn"],
-        },
-      ],
     });
-
-    // sum all contract.max_payout values
     const totalMaxPayout = campaigns.reduce((sum, campaign) => {
-      const payout = campaign.contract?.max_payout
-        ? parseFloat(
-            campaign.contract.max_payout - campaign.contract.amount_withdrawn
-          )
-        : 0;
-      return sum + payout;
+      return sum + parseFloat(campaign.max_payout || 0);
     }, 0);
-    console.log("Max Payout fetched:", totalMaxPayout);
     res.json({ totalMaxPayout });
   } catch (error) {
     console.error("Get max payout for user error:", error);
     res.status(500).json({ error: "Internal server error" });
   }
 };
+
 const getCurrentPayout = async (req, res) => {
   try {
     const userId = req.user.userId;
-
     const campaigns = await Campaign.findAll({
       where: { creator_id: userId },
-      include: [
-        {
-          model: Contract,
-          as: "contract",
-          attributes: ["cpm_rate"], // need this for the virtual getter
-        },
-      ],
+      include: [{ model: Contract, as: "contract", attributes: ["cpm_rate"] }],
     });
-
     const totalCurrentPayout = campaigns.reduce((sum, campaign) => {
-      const payout = campaign.amount_earned
-        ? parseFloat(
-            campaign.amount_earned - campaign.contract.amount_withdrawn
-          )
-        : 0;
-      return sum + payout;
+      return sum + parseFloat(campaign.amount_earned || 0);
     }, 0);
-
     res.json({ totalCurrentPayout });
   } catch (error) {
     console.error("Get current payout for user error:", error);

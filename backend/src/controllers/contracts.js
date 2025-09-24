@@ -282,6 +282,7 @@ const acceptContract = async (req, res) => {
       contract_id: id,
       creator_id: req.user.userId,
       status: "accepted",
+      max_payout: contract.max_payout / contract.num_campaigns,
     });
 
     res.json({

@@ -22,12 +22,12 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     title: "",
     description: "",
     cpm_rate: 5.0,
-    max_payout: 400.0,
+    max_payout: 4000.0,
     min_views: 1000,
     target_audience: "",
     content_requirements: "",
     platform: "tiktok",
-    company_charge: 500.0,
+    company_charge: 5000.0,
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
