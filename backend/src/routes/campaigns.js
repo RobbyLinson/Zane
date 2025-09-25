@@ -8,6 +8,7 @@ const {
   getCampaignsByUser,
   getMaxPayout,
   getCurrentPayout,
+  withdrawUserBalance,
 } = require("../controllers/campaigns");
 const { authenticateToken, requireUserType } = require("../middleware/auth");
 
@@ -23,5 +24,6 @@ router.get("/current-payout", getCurrentPayout);
 router.get("/:id", getCampaign);
 router.put("/:id", requireUserType("creator"), updateCampaign);
 router.delete("/:id", requireUserType("creator"), deleteCampaign);
+router.post("/withdraw", requireUserType("creator"), withdrawUserBalance);
 
 module.exports = router;

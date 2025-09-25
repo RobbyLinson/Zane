@@ -29,11 +29,13 @@ class PaymentService {
     if (!stripeCustomerId) {
       throw new Error("Brand has no Stripe customer ID");
     }
+    console.log(`creating payment intent for customer ${stripeCustomerId}`);
     // Create PaymentIntent for the full contract charge
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(companyCharge * 100),
-      currency: "eur",
+      amount: Math.round(companyCharge * 100), // in cents
+      currency: "usd",
       customer: stripeCustomerId,
+      return_url: `${process.env.FRONTEND_URL}/payment/complete`,
       metadata: {
         type: "contract_funding_draft",
         brand_id: brandId,

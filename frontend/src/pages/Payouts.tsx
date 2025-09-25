@@ -31,14 +31,20 @@ export const Payouts: React.FC = () => {
     };
     fetchMaxPayout();
     fetchCurrentPayout();
-  }, [userId]);
+  }, [userId, withdrawn]);
 
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
-    setTimeout(() => {
+    try {
+      await api.withdrawUserBalance(currentPayout);
+      setCurrentPayout(0);
       setWithdrawn(true);
+    } catch (err) {
+      console.error("Withdrawal failed:", err);
+      alert("Withdrawal failed. Please try again.");
+    } finally {
       setIsWithdrawing(false);
-    }, 1500);
+    }
   };
 
   return (

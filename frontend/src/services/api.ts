@@ -144,6 +144,13 @@ class ApiService {
       method: "DELETE",
     });
   }
+
+  async withdrawUserBalance(amount: number) {
+    return this.request("/campaigns/withdraw", {
+      method: "POST",
+      body: JSON.stringify({ amount }),
+    });
+  }
   async fundDraft(contractDraft: CreateContractData) {
     return this.request("/payments/contracts/fund-draft", {
       method: "POST",
