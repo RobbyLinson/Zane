@@ -39,4 +39,6 @@ app.use("/api/user", require("./routes/user"));
 
 app.use("/api/payments", require("./routes/payments"));
 
+app.use("/api/tiktok", require("./routes/tiktok"));
+
 module.exports = app;

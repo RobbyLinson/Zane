@@ -73,6 +73,23 @@ class ApiService {
     return this.request(`/contracts${query}`);
   }
 
+  async submitTikTokContent(campaignId: string, tiktokUrl: string) {
+    return this.request(`/tiktok/campaigns/${campaignId}/submit-content`, {
+      method: "POST",
+      body: JSON.stringify({ tiktokUrl }),
+    });
+  }
+
+  async updateAllTikTokCampaignViews() {
+    return this.request("/tiktok/campaigns/update-all-views", {
+      method: "PUT",
+    });
+  }
+
+  async authenticateTiktokAccount() {
+    return this.request("/tiktok/auth");
+  }
+
   async getContract(id: string) {
     return this.request(`/contracts/${id}`);
   }

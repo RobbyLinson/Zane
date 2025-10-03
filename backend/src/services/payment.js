@@ -35,7 +35,6 @@ class PaymentService {
       amount: Math.round(companyCharge * 100), // in cents
       currency: "usd",
       customer: stripeCustomerId,
-      return_url: `${process.env.FRONTEND_URL}/payment/complete`,
       metadata: {
         type: "contract_funding_draft",
         brand_id: brandId,

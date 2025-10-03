@@ -32,6 +32,35 @@ export const Campaigns: React.FC = () => {
     fetchCampaigns();
   }, [isCreator, isBrand]);
 
+  const handleContentSubmitted = () => {
+    // Re-fetch campaigns to update status and view tracking
+    setLoading(true);
+    api
+      .request("/tiktok/campaigns")
+      .then((response) => setCampaigns(response.campaigns || []))
+      .catch((err) => console.error("Failed to reload campaigns:", err))
+      .finally(() => setLoading(false));
+  };
+
+  const handleUpdateViews = async () => {
+    setLoading(true);
+    try {
+      await api.updateAllTikTokCampaignViews();
+      // Re-fetch campaigns after updating views
+      if (isCreator) {
+        const response = await api.getMyCampaigns();
+        setCampaigns(response.campaigns || []);
+      } else if (isBrand) {
+        const response = await api.getBrandCampaigns();
+        setCampaigns(response.campaigns || []);
+      }
+    } catch (err) {
+      console.error("Failed to update TikTok views:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -47,6 +76,15 @@ export const Campaigns: React.FC = () => {
                   : "View analytics for all creator campaigns"}
               </p>
             </div>
+            {isCreator && (
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={handleUpdateViews}
+                disabled={loading}
+              >
+                Update TikTok Views
+              </button>
+            )}
           </div>
 
           {loading ? (
@@ -63,6 +101,7 @@ export const Campaigns: React.FC = () => {
                   campaign={campaign}
                   userType={isCreator ? "creator" : "brand"}
                   onView={(c) => console.log("View campaign:", c)}
+                  onContentSubmitted={handleContentSubmitted}
                 />
               ))}
             </div>

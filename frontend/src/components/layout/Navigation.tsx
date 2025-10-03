@@ -16,6 +16,8 @@ export const Navigation: React.FC<NavigationProps> = ({
   const [loadingStripe, setLoadingStripe] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [verifyingTikTok, setVerifyingTikTok] = useState(false);
+  const [tiktokVerified, setTikTokVerified] = useState<boolean | null>(null);
 
   // --- Stripe onboarding check ---
   useEffect(() => {
@@ -70,6 +72,26 @@ export const Navigation: React.FC<NavigationProps> = ({
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
+  };
+
+  const handleVerifyTikTok = async () => {
+    setVerifyingTikTok(true);
+    setTikTokVerified(null);
+    try {
+      // 1. Get TikTok OAuth URL from backend
+      const response = await api.authenticateTiktokAccount();
+      if (response.authUrl) {
+        // 2. Redirect user to TikTok OAuth
+        window.location.href = response.authUrl;
+      } else {
+        alert("Failed to get TikTok auth URL.");
+        setVerifyingTikTok(false);
+      }
+    } catch (err) {
+      setTikTokVerified(false);
+      alert(`TikTok verification failed: ${err}`);
+      setVerifyingTikTok(false);
+    }
   };
 
   const navItems =
@@ -164,6 +186,16 @@ export const Navigation: React.FC<NavigationProps> = ({
                         >
                           View Details
                         </button>
+
+                        {user?.user_type === "creator" && (
+                          <button
+                            onClick={handleVerifyTikTok}
+                            disabled={verifyingTikTok}
+                            className="w-full text-left px-4 py-2 text-sm text-blue-700 hover:bg-blue-50 hover:text-blue-900 disabled:opacity-50"
+                          >
+                            {verifyingTikTok ? "Verifying..." : "Verify TikTok"}
+                          </button>
+                        )}
 
                         {stripeUrl && (
                           <button

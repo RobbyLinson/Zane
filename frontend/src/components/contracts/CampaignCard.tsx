@@ -6,14 +6,20 @@ interface CampaignCardProps {
   campaign: Campaign;
   userType: "creator" | "brand";
   onView?: (campaign: Campaign) => void;
+  onContentSubmitted?: () => void; // Add this prop to notify parent to refresh
 }
 
 export const CampaignCard: React.FC<CampaignCardProps> = ({
   campaign,
   userType,
   onView,
+  onContentSubmitted,
 }) => {
   const [contract, setContract] = useState<Contract | null>(null);
+  const [showContentForm, setShowContentForm] = useState(false);
+  const [tiktokUrl, setTiktokUrl] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchContract = async () => {
@@ -34,6 +40,23 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
     tracking: "bg-purple-100 text-purple-800",
     completed: "bg-green-100 text-green-800",
     paid: "bg-gray-100 text-gray-800",
+  };
+
+  // Submit TikTok content handler
+  const handleSubmitContent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError(null);
+    try {
+      await api.submitTikTokContent(campaign.id, tiktokUrl);
+      setShowContentForm(false);
+      setTiktokUrl("");
+      if (onContentSubmitted) onContentSubmitted();
+    } catch (err: any) {
+      setError(err.message || "Failed to submit TikTok content.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -74,7 +97,7 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
             <p className="text-sm text-gray-700">
               Amount earned: €{campaign.amount_earned}
             </p>
-            {campaign.content_url && (
+            {campaign.content_url ? (
               <p className="text-sm text-gray-700">
                 Content URL:{" "}
                 <a
@@ -86,6 +109,41 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
                   View Content
                 </a>
               </p>
+            ) : (
+              // Show submit TikTok content form if not submitted
+              campaign.status === "accepted" && (
+                <>
+                  <button
+                    className="text-blue-600 underline text-sm mb-2"
+                    onClick={() => setShowContentForm((v) => !v)}
+                  >
+                    {showContentForm ? "Cancel" : "Submit TikTok Content"}
+                  </button>
+                  {showContentForm && (
+                    <form onSubmit={handleSubmitContent} className="mt-2">
+                      <input
+                        type="url"
+                        required
+                        placeholder="Paste your TikTok video URL"
+                        value={tiktokUrl}
+                        onChange={(e) => setTiktokUrl(e.target.value)}
+                        className="border px-2 py-1 rounded w-full mb-2"
+                        disabled={submitting}
+                      />
+                      <button
+                        type="submit"
+                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
+                        disabled={submitting}
+                      >
+                        {submitting ? "Submitting..." : "Submit"}
+                      </button>
+                      {error && (
+                        <div className="text-red-500 text-xs mt-1">{error}</div>
+                      )}
+                    </form>
+                  )}
+                </>
+              )
             )}
           </>
         ) : (
