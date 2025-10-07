@@ -92,6 +92,7 @@ export const Navigation: React.FC<NavigationProps> = ({
       alert(`TikTok verification failed: ${err}`);
       setVerifyingTikTok(false);
     }
+    console.log("TikTok verification process initiated. ", tiktokVerified);
   };
 
   const navItems =
