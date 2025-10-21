@@ -9,7 +9,7 @@ const tiktokService = new TikTokService();
 const initiateTikTokAuth = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const redirectUri = `${process.env.FRONTEND_URL}`;
+    const redirectUri = `${process.env.FRONTEND_URL}/api/tiktok/callback`;
 
     const authUrl = tiktokService.getAuthURL(redirectUri, userId);
 
@@ -23,12 +23,11 @@ const initiateTikTokAuth = async (req, res) => {
   }
 };
 
-// TikTok OAuth callback handler
 const handleTikTokCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
     const userId = state; // userId from state parameter
-    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
+    const redirectUri = `${process.env.FRONTEND_URL}/api/tiktok/callback`;
 
     if (!code) {
       return res.redirect(
@@ -44,7 +43,7 @@ const handleTikTokCallback = async (req, res) => {
     );
 
     // Store token for user
-    tiktokService.storeAccessToken(userId, tokenData);
+    await tiktokService.storeAccessToken(userId, tokenData);
 
     // Redirect to success page
     res.redirect(`${process.env.FRONTEND_URL}/dashboard?tiktok_connected=true`);
@@ -57,7 +56,6 @@ const handleTikTokCallback = async (req, res) => {
     );
   }
 };
-
 // Submit TikTok content URL to campaign
 const submitCampaignContent = async (req, res) => {
   try {
