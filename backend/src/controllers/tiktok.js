@@ -27,11 +27,12 @@ const handleTikTokCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
     const userId = state; // userId from state parameter
-    const redirectUri = `${process.env.FRONTEND_URL}/api/tiktok/callback`;
+    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
+    console.log("Redirect URI:", redirectUri);
 
     if (!code) {
       return res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard?tiktok_error=access_denied`
+        `${process.env.BASE_URL}/dashboard?tiktok_error=access_denied`
       );
     }
 
@@ -43,7 +44,7 @@ const handleTikTokCallback = async (req, res) => {
     );
 
     // Store token for user
-    await tiktokService.storeAccessToken(userId, tokenData);
+    tiktokService.storeAccessToken(userId, tokenData);
 
     // Redirect to success page
     res.redirect(`${process.env.FRONTEND_URL}/dashboard?tiktok_connected=true`);
