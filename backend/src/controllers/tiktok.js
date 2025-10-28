@@ -10,18 +10,7 @@ const initiateTikTokAuth = async (req, res) => {
   try {
     const userId = req.user.userId;
     console.log("Environment BASE_URL:", process.env.BASE_URL);
-    console.log(
-      "Full redirect URI before encoding:",
-      `${process.env.BASE_URL}/api/tiktok/callback`
-    );
-    const redirectUri = encodeURIComponent(
-      `${process.env.BASE_URL}/api/tiktok/callback`
-    );
-    console.log("Encoded redirect URI:", redirectUri);
-    console.log(
-      "Generated auth URL:",
-      tiktokService.getAuthURL(redirectUri, userId)
-    );
+    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
 
     const authUrl = tiktokService.getAuthURL(redirectUri, userId);
 
@@ -41,10 +30,7 @@ const handleTikTokCallback = async (req, res) => {
     const userId = state;
 
     // IMPORTANT: This must match the original redirect_uri exactly
-    const redirectUri = encodeURIComponent(
-      `${process.env.BASE_URL}/api/tiktok/callback`
-    );
-
+    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
     // Debug logging
     console.log("Callback Debug Info:", {
       originalRedirectUri: `${process.env.BASE_URL}/api/tiktok/callback`,
