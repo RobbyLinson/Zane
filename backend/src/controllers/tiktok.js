@@ -9,8 +9,19 @@ const tiktokService = new TikTokService();
 const initiateTikTokAuth = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
-    console.log("Redirect URI:", redirectUri);
+    console.log("Environment BASE_URL:", process.env.BASE_URL);
+    console.log(
+      "Full redirect URI before encoding:",
+      `${process.env.BASE_URL}/api/tiktok/callback`
+    );
+    const redirectUri = encodeURIComponent(
+      `${process.env.BASE_URL}/api/tiktok/callback`
+    );
+    console.log("Encoded redirect URI:", redirectUri);
+    console.log(
+      "Generated auth URL:",
+      tiktokService.getAuthURL(redirectUri, userId)
+    );
 
     const authUrl = tiktokService.getAuthURL(redirectUri, userId);
 
