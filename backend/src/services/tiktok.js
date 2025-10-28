@@ -42,7 +42,7 @@ class TikTokService {
       client_key: this.clientKey,
       scope: scopes,
       response_type: "code",
-      redirect_uri: "https://robbylinson.dev",
+      redirect_uri: redirectUri,
       state: userId.toString(), // Ensure state is a string
       code_challenge: codeChallenge,
       code_challenge_method: "S256",
