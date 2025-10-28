@@ -10,6 +10,7 @@ const initiateTikTokAuth = async (req, res) => {
   try {
     const userId = req.user.userId;
     const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
+    console.log("Redirect URI:", redirectUri);
 
     const authUrl = tiktokService.getAuthURL(redirectUri, userId);
 
