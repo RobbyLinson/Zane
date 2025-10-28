@@ -39,7 +39,9 @@ const handleTikTokCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
     const userId = state; // userId from state parameter
-    const redirectUri = `${process.env.FRONTEND_URL}/api/tiktok/callback`;
+    const redirectUri = encodeURIComponent(
+      `${process.env.FRONTEND_URL}/api/tiktok/callback`
+    );
     console.log("Redirect URI:", redirectUri);
 
     if (!code) {
