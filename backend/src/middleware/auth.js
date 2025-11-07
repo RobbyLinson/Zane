@@ -8,7 +8,7 @@ const authenticateToken = async (req, res, next) => {
 
     if (!token) {
       return res.status(401).json({
-        error: "Access token required shrinky dink",
+        error: "Access token required",
       });
     }
 

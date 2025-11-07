@@ -27,45 +27,26 @@ const initiateTikTokAuth = async (req, res) => {
 const handleTikTokCallback = async (req, res) => {
   try {
     const { code, state } = req.query;
-    const userId = state;
-
-    // IMPORTANT: This must match the original redirect_uri exactly
-    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
-    // Debug logging
-    console.log("Callback Debug Info:", {
-      originalRedirectUri: `${process.env.BASE_URL}/api/tiktok/callback`,
-      receivedCode: code?.substring(0, 10) + "...",
-      state: state,
-      baseUrl: process.env.BASE_URL,
-      frontendUrl: process.env.FRONTEND_URL,
-    });
+    const userId = state; // This is the user ID we passed earlier
 
     if (!code) {
-      console.log("No code received in callback");
       return res.redirect(
         `${process.env.FRONTEND_URL}/dashboard?tiktok_error=access_denied`
       );
     }
 
-    // Exchange code for access token
+    const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
     const tokenData = await tiktokService.getAccessToken(
       code,
-      redirectUri, // Using the same redirect URI as initial request
+      redirectUri,
       userId
     );
-
-    // Store token for user
     await tiktokService.storeAccessToken(userId, tokenData);
 
-    // Redirect to frontend success page
+    // Redirect to frontend with success status
     res.redirect(`${process.env.FRONTEND_URL}/dashboard?tiktok_connected=true`);
   } catch (error) {
-    console.error("TikTok callback error details:", {
-      message: error.message,
-      response: error.response?.data,
-      stack: error.stack,
-    });
-
+    console.error("TikTok callback error:", error);
     res.redirect(
       `${process.env.FRONTEND_URL}/dashboard?tiktok_error=${encodeURIComponent(
         error.message
