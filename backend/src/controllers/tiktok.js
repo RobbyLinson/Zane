@@ -49,21 +49,19 @@ const handleTikTokCallback = async (req, res) => {
       await tiktokService.storeAccessToken(userId, tokenData);
 
       console.log("TikTok authentication successful");
-      res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard?tiktok_connected=true`
-      );
+      res.redirect(`${process.env.FRONTEND_URL}/?tiktok_connected=true`);
     } catch (error) {
       console.error("Failed to exchange token:", error);
       res.redirect(
-        `${
-          process.env.FRONTEND_URL
-        }/dashboard?tiktok_error=${encodeURIComponent(error.message)}`
+        `${process.env.FRONTEND_URL}/?tiktok_error=${encodeURIComponent(
+          error.message
+        )}`
       );
     }
   } catch (error) {
     console.error("TikTok callback error:", error);
     res.redirect(
-      `${process.env.FRONTEND_URL}/dashboard?tiktok_error=${encodeURIComponent(
+      `${process.env.FRONTEND_URL}/?tiktok_error=${encodeURIComponent(
         error.message
       )}`
     );
