@@ -76,25 +76,20 @@ export const Navigation: React.FC<NavigationProps> = ({
 
   const handleVerifyTikTok = async () => {
     setVerifyingTikTok(true);
-    setTikTokVerified(null);
     try {
-      // 1. Get TikTok OAuth URL from backend
       const response = await api.authenticateTiktokAccount();
       if (response.authUrl) {
-        // 2. Redirect user to TikTok OAuth
+        // Store the current URL to return to after auth
+        localStorage.setItem("tiktokAuthReturn", window.location.href);
         window.location.href = response.authUrl;
-      } else {
-        alert("Failed to get TikTok auth URL.");
-        setVerifyingTikTok(false);
       }
-    } catch (err) {
+    } catch (error) {
+      console.error("TikTok verification failed:", error);
       setTikTokVerified(false);
-      alert(`TikTok verification failed: ${err}`);
+    } finally {
       setVerifyingTikTok(false);
     }
-    console.log("TikTok verification process initiated. ", tiktokVerified);
   };
-
   const navItems =
     user?.user_type === "creator"
       ? [

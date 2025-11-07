@@ -16,11 +16,12 @@ const { authenticateToken, requireUserType } = require("../middleware/auth");
 
 const router = express.Router();
 
+router.get("/callback", handleTikTokCallback); // No auth needed for OAuth callback
+
 router.use(authenticateToken);
 
 // TikTok OAuth Routes
 router.get("/auth", initiateTikTokAuth);
-router.get("/callback", handleTikTokCallback); // No auth needed for OAuth callback
 
 // TikTok Connection Management
 router.get("/status", getTikTokConnectionStatus);
