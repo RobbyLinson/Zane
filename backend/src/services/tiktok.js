@@ -44,8 +44,8 @@ class TikTokService {
       response_type: "code",
       redirect_uri: redirectUri,
       state: userId.toString(), // Ensure state is a string
-      code_challenge: codeChallenge,
-      code_challenge_method: "S256",
+      // code_challenge: codeChallenge,
+      // code_challenge_method: "S256",
     });
 
     const authUrl = `https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`;
@@ -72,7 +72,7 @@ class TikTokService {
           code: authCode,
           grant_type: "authorization_code",
           redirect_uri: redirectUri,
-          code_verifier: codeVerifier, // <-- REQUIRED for PKCE
+          // code_verifier: codeVerifier, // <-- REQUIRED for PKCE
         },
         {
           headers: {
