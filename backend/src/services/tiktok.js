@@ -200,7 +200,7 @@ class TikTokService {
       }
 
       // Extract and validate video ID
-      const videoId = this.extractVideoId(tiktokUrl);
+      const videoId = await this.extractVideoId(tiktokUrl);
 
       // Update campaign with content URL and change status
       await campaign.update({
@@ -239,7 +239,10 @@ class TikTokService {
       }
 
       // Extract video ID and get current stats
-      const videoId = this.extractVideoId(campaign.content_url, accessToken);
+      const videoId = await this.extractVideoId(
+        campaign.content_url,
+        accessToken
+      );
       const videoStats = await this.getVideoStats(videoId, accessToken);
 
       // Update campaign with new view count
@@ -344,7 +347,7 @@ class TikTokService {
       let videoStats = null;
       if (campaign.content_url && accessToken) {
         try {
-          const videoId = this.extractVideoId(campaign.content_url);
+          const videoId = await this.extractVideoId(campaign.content_url);
           const stats = await this.getVideoStats(videoId, accessToken);
           videoStats = {
             views: stats.view_count,
