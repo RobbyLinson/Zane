@@ -142,11 +142,14 @@ class TikTokService {
   // Step 4: Get video statistics from TikTok API
   async getVideoStats(videoId, accessToken) {
     try {
+      // Ensure videoId is a string
+      const videoIdStr = String(videoId);
+
       const response = await axios.post(
         `${this.baseURL}/v2/video/query/`,
         {
           filters: {
-            video_ids: [videoId],
+            video_ids: [videoIdStr],
           },
         },
         {
@@ -161,7 +164,11 @@ class TikTokService {
         }
       );
 
-      if (response.data.data && response.data.data.videos.length > 0) {
+      if (
+        response.data.data &&
+        response.data.data.videos &&
+        response.data.data.videos.length > 0
+      ) {
         return response.data.data.videos[0];
       }
 
