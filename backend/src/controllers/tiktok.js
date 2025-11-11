@@ -122,6 +122,8 @@ const updateAllCampaignViews = async (req, res) => {
     // Get valid access token
     const accessToken = await tiktokService.getValidAccessToken(userId);
 
+    console.log("Updating all campaigns for user:", userId);
+
     // Update all campaigns
     const result = await tiktokService.updateAllUserCampaigns(
       userId,

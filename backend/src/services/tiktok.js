@@ -120,17 +120,12 @@ class TikTokService {
           filters: {
             video_ids: [videoId],
           },
-          fields: [
-            "id",
-            "title",
-            "view_count",
-            "like_count",
-            "comment_count",
-            "share_count",
-            "create_time",
-          ],
         },
         {
+          params: {
+            fields:
+              "id,title,view_count,like_count,comment_count,share_count,create_time",
+          },
           headers: {
             Authorization: `Bearer ${accessToken}`,
             "Content-Type": "application/json",
@@ -152,7 +147,6 @@ class TikTokService {
       );
     }
   }
-
   // Step 5: Submit content URL to campaign (when creator uploads TikTok)
   async submitContentToCampaign(campaignId, tiktokUrl, userId) {
     try {
