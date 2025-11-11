@@ -82,7 +82,8 @@ const submitCampaignContent = async (req, res) => {
     const result = await tiktokService.submitContentToCampaign(
       campaignId,
       tiktokUrl,
-      userId
+      userId,
+      accessToken
     );
 
     res.json(result);

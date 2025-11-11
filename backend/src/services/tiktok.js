@@ -91,7 +91,6 @@ class TikTokService {
   }
 
   // Step 3: Extract video ID from various TikTok URL formats
-  // Step 3: Extract video ID from various TikTok URL formats
   async extractVideoId(tiktokUrl, accessToken) {
     const patterns = [
       { regex: /tiktok\.com\/@[^\/]+\/video\/(\d+)/, type: "numeric" }, // Standard format
@@ -111,26 +110,38 @@ class TikTokService {
         }
 
         // If it's a short code, resolve it to numeric ID
-        if (pattern.type === "short" && accessToken) {
+        if (pattern.type === "short") {
           try {
             const response = await axios.get(tiktokUrl, {
-              maxRedirects: 0,
-              validateStatus: (status) => status < 500,
+              maxRedirects: 5,
+              validateStatus: () => true, // Accept all status codes
             });
 
-            // Extract video ID from redirect URL
-            const redirectUrl = response.headers.location;
-            const videoIdMatch = redirectUrl?.match(/\/video\/(\d+)/);
+            // Try to extract from final URL if redirect happened
+            const finalUrl =
+              response.request?.res?.responseUrl || response.config?.url;
+            const videoIdMatch = finalUrl?.match(/\/video\/(\d+)/);
             if (videoIdMatch) {
+              console.log(
+                `Resolved short code to numeric ID: ${videoIdMatch[1]}`
+              );
               return videoIdMatch[1];
             }
+
+            // If no match from redirect, throw error
+            throw new Error(
+              `Could not resolve short code from URL: ${finalUrl}`
+            );
           } catch (error) {
-            console.error("Failed to resolve short code:", error.message);
+            console.error(
+              `Failed to resolve short code ${videoIdOrCode}:`,
+              error.message
+            );
+            throw new Error(
+              `Unable to extract numeric video ID from short code. Please use the full video URL with the numeric ID (tiktok.com/@username/video/[numeric_id])`
+            );
           }
         }
-
-        // Fallback: return the short code (will likely fail, but better error message)
-        return videoIdOrCode;
       }
     }
 
@@ -183,7 +194,7 @@ class TikTokService {
     }
   }
   // Step 5: Submit content URL to campaign (when creator uploads TikTok)
-  async submitContentToCampaign(campaignId, tiktokUrl, userId) {
+  async submitContentToCampaign(campaignId, tiktokUrl, userId, accessToken) {
     try {
       // Find the campaign and verify ownership
       const campaign = await Campaign.findOne({
@@ -200,7 +211,7 @@ class TikTokService {
       }
 
       // Extract and validate video ID
-      const videoId = await this.extractVideoId(tiktokUrl);
+      const videoId = await this.extractVideoId(tiktokUrl, accessToken);
 
       // Update campaign with content URL and change status
       await campaign.update({
@@ -347,7 +358,10 @@ class TikTokService {
       let videoStats = null;
       if (campaign.content_url && accessToken) {
         try {
-          const videoId = await this.extractVideoId(campaign.content_url);
+          const videoId = await this.extractVideoId(
+            campaign.content_url,
+            accessToken
+          );
           const stats = await this.getVideoStats(videoId, accessToken);
           videoStats = {
             views: stats.view_count,
