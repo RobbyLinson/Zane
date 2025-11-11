@@ -91,18 +91,46 @@ class TikTokService {
   }
 
   // Step 3: Extract video ID from various TikTok URL formats
-  extractVideoId(tiktokUrl) {
+  // Step 3: Extract video ID from various TikTok URL formats
+  async extractVideoId(tiktokUrl, accessToken) {
     const patterns = [
-      /tiktok\.com\/@[^\/]+\/video\/(\d+)/, // Standard format
-      /vm\.tiktok\.com\/([A-Za-z0-9]+)/, // Mobile share format
-      /tiktok\.com\/t\/([A-Za-z0-9]+)/, // Short format
-      /tiktok\.com.*\/video\/(\d+)/, // Catch variations
+      { regex: /tiktok\.com\/@[^\/]+\/video\/(\d+)/, type: "numeric" }, // Standard format
+      { regex: /vm\.tiktok\.com\/([A-Za-z0-9]+)/, type: "short" }, // Mobile share format
+      { regex: /tiktok\.com\/t\/([A-Za-z0-9]+)/, type: "short" }, // Short format
+      { regex: /tiktok\.com.*\/video\/(\d+)/, type: "numeric" }, // Catch variations
     ];
 
     for (const pattern of patterns) {
-      const match = tiktokUrl.match(pattern);
+      const match = tiktokUrl.match(pattern.regex);
       if (match) {
-        return match[1];
+        const videoIdOrCode = match[1];
+
+        // If it's already numeric, return it
+        if (pattern.type === "numeric") {
+          return videoIdOrCode;
+        }
+
+        // If it's a short code, resolve it to numeric ID
+        if (pattern.type === "short" && accessToken) {
+          try {
+            const response = await axios.get(tiktokUrl, {
+              maxRedirects: 0,
+              validateStatus: (status) => status < 500,
+            });
+
+            // Extract video ID from redirect URL
+            const redirectUrl = response.headers.location;
+            const videoIdMatch = redirectUrl?.match(/\/video\/(\d+)/);
+            if (videoIdMatch) {
+              return videoIdMatch[1];
+            }
+          } catch (error) {
+            console.error("Failed to resolve short code:", error.message);
+          }
+        }
+
+        // Fallback: return the short code (will likely fail, but better error message)
+        return videoIdOrCode;
       }
     }
 
@@ -204,7 +232,7 @@ class TikTokService {
       }
 
       // Extract video ID and get current stats
-      const videoId = this.extractVideoId(campaign.content_url);
+      const videoId = this.extractVideoId(campaign.content_url, accessToken);
       const videoStats = await this.getVideoStats(videoId, accessToken);
 
       // Update campaign with new view count
