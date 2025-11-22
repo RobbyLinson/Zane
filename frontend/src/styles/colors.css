@@ -1,16 +1,4 @@
-@import "tailwindcss";
-@import "./styles/colors.css";
-
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-@theme {
+:root {
   /* PRIMARY */
   --primary-50: #f1faf5;
   --primary-100: #dff3e7;
@@ -96,16 +84,16 @@ body {
   --surface-900: #434d49;
 
   /* BORDER */
-  --border-50: #4a4d4a;
-  --border-100: #525451;
-  --border-200: #5a5d5a;
-  --border-300: #636663;
-  --border-400: #6b6e6b;
-  --border-500: #737673;
-  --border-600: #7b7e7b;
-  --border-700: #838683;
-  --border-800: #8b8e8b;
-  --border-900: #939693;
+  --border-50: #1a1e1c;
+  --border-100: #202421;
+  --border-200: #272a28;
+  --border-300: #2e312f;
+  --border-400: #353836;
+  --border-500: #3c3f3c;
+  --border-600: #434643;
+  --border-700: #4a4d4a;
+  --border-800: #515451;
+  --border-900: #585b58;
 
   /* BACKGROUND */
   --background-50: #0c0f0e;

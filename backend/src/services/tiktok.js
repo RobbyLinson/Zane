@@ -110,38 +110,26 @@ class TikTokService {
         }
 
         // If it's a short code, resolve it to numeric ID
-        if (pattern.type === "short") {
+        if (pattern.type === "short" && accessToken) {
           try {
             const response = await axios.get(tiktokUrl, {
-              maxRedirects: 5,
-              validateStatus: () => true, // Accept all status codes
+              maxRedirects: 0,
+              validateStatus: (status) => status < 500,
             });
 
-            // Try to extract from final URL if redirect happened
-            const finalUrl =
-              response.request?.res?.responseUrl || response.config?.url;
-            const videoIdMatch = finalUrl?.match(/\/video\/(\d+)/);
+            // Extract video ID from redirect URL
+            const redirectUrl = response.headers.location;
+            const videoIdMatch = redirectUrl?.match(/\/video\/(\d+)/);
             if (videoIdMatch) {
-              console.log(
-                `Resolved short code to numeric ID: ${videoIdMatch[1]}`
-              );
               return videoIdMatch[1];
             }
-
-            // If no match from redirect, throw error
-            throw new Error(
-              `Could not resolve short code from URL: ${finalUrl}`
-            );
           } catch (error) {
-            console.error(
-              `Failed to resolve short code ${videoIdOrCode}:`,
-              error.message
-            );
-            throw new Error(
-              `Unable to extract numeric video ID from short code. Please use the full video URL with the numeric ID (tiktok.com/@username/video/[numeric_id])`
-            );
+            console.error("Failed to resolve short code:", error.message);
           }
         }
+
+        // Fallback: return the short code (will likely fail, but better error message)
+        return videoIdOrCode;
       }
     }
 
