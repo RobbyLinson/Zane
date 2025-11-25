@@ -70,7 +70,7 @@ class TikTokService {
       throw new Error("Missing code_verifier for PKCE");
     }
     try {
-      const body = await URLSearchParams({
+      const body = new URLSearchParams({
         client_key: this.clientKey,
         client_secret: this.clientSecret,
         code: authCode,
