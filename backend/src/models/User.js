@@ -54,6 +54,18 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    tiktok_refresh_token: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    tiktok_expires_at: {
+      type: DataTypes.BIGINT,
+      allowNull: true,
+    },
+    tiktok_code_verifier: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   },
   {
     tableName: "users",

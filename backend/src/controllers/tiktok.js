@@ -12,7 +12,7 @@ const initiateTikTokAuth = async (req, res) => {
     console.log("Environment BASE_URL:", process.env.BASE_URL);
     const redirectUri = `${process.env.BASE_URL}/api/tiktok/callback`;
 
-    const authUrl = tiktokService.getAuthURL(redirectUri, userId);
+    const authUrl = await tiktokService.getAuthURL(redirectUri, userId);
 
     res.json({
       success: true,
@@ -79,6 +79,7 @@ const submitCampaignContent = async (req, res) => {
       return res.status(400).json({ error: "TikTok URL is required" });
     }
 
+    const accessToken = await tiktokService.getValidAccessToken(userId);
     const result = await tiktokService.submitContentToCampaign(
       campaignId,
       tiktokUrl,
@@ -167,7 +168,7 @@ const getCampaignAnalytics = async (req, res) => {
 const getTikTokConnectionStatus = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const tokenData = tiktokService.getStoredAccessToken(userId);
+    const tokenData = await tiktokService.getStoredAccessToken(userId);
 
     res.json({
       success: true,
@@ -185,8 +186,14 @@ const disconnectTikTok = async (req, res) => {
   try {
     const userId = req.user.userId;
 
-    // Remove stored token (in production, remove from database)
-    tiktokService.accessTokens.delete(userId);
+    await User.update(
+      {
+        tiktok_access_token: null,
+        tiktok_refresh_token: null,
+        tiktok_expires_at: null,
+      },
+      { where: { id: userId } }
+    );
 
     res.json({
       success: true,

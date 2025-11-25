@@ -24,7 +24,7 @@ class TikTokService {
   }
 
   // Step 1: Generate TikTok OAuth URL
-  getAuthURL(redirectUri, userId) {
+  async getAuthURL(redirectUri, userId) {
     // Validate required parameters
     if (!this.clientKey) {
       throw new Error("TIKTOK_CLIENT_KEY is not configured");
@@ -37,6 +37,11 @@ class TikTokService {
 
     this.accessTokens.set(`${userId}_verifier`, codeVerifier);
 
+    await User.update(
+      { tiktok_code_verifier: codeVerifier },
+      { where: { id: userId } }
+    );
+
     // Build URL manually for better control
     const params = new URLSearchParams({
       client_key: this.clientKey,
@@ -44,8 +49,8 @@ class TikTokService {
       response_type: "code",
       redirect_uri: redirectUri,
       state: userId.toString(), // Ensure state is a string
-      // code_challenge: codeChallenge,
-      // code_challenge_method: "S256",
+      code_challenge: codeChallenge,
+      code_challenge_method: "S256",
     });
 
     const authUrl = `https://www.tiktok.com/v2/auth/authorize/?${params.toString()}`;
@@ -59,27 +64,38 @@ class TikTokService {
 
   // Step 2: Exchange authorization code for access token
   async getAccessToken(authCode, redirectUri, userId) {
-    const codeVerifier = this.accessTokens.get(`${userId}_verifier`);
+    const user = await User.findByPk(userId);
+    const codeVerifier = user?.tiktok_code_verifier;
     if (!codeVerifier) {
       throw new Error("Missing code_verifier for PKCE");
     }
     try {
+      const body = await URLSearchParams({
+        client_key: this.clientKey,
+        client_secret: this.clientSecret,
+        code: authCode,
+        grant_type: "authorization_code",
+        redirect_uri: redirectUri,
+        code_verifier: codeVerifier,
+      });
+
       const response = await axios.post(
         `${this.baseURL}/v2/oauth/token/`,
-        {
-          client_key: this.clientKey,
-          client_secret: this.clientSecret,
-          code: authCode,
-          grant_type: "authorization_code",
-          redirect_uri: redirectUri,
-          // code_verifier: codeVerifier, // <-- REQUIRED for PKCE
-        },
+        body.toString(),
         {
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
         }
       );
+
+      await this.storeAccessToken(userId, response.data);
+
+      await User.updatee(
+        { tiktok_code_verifier: null },
+        { where: { id: userId } }
+      );
+
       return response.data;
     } catch (error) {
       console.error(
@@ -387,16 +403,26 @@ class TikTokService {
   }
 
   // Token management methods (store in database in production)
-  storeAccessToken(userId, tokenData) {
-    this.accessTokens.set(userId, {
-      access_token: tokenData.access_token,
-      refresh_token: tokenData.refresh_token,
-      expires_at: Date.now() + tokenData.expires_in * 1000,
-    });
+  async storeAccessToken(userId, tokenData) {
+    const expiresAt = Date.now() + (tokenData.expires_in || 0) * 1000;
+    await User.update(
+      {
+        tiktok_access_token: tokenData.access_token,
+        tiktok_refresh_token: tokenData.refresh_token,
+        tiktok_expires_at: expiresAt,
+      },
+      { where: { id: userId } }
+    );
   }
 
-  getStoredAccessToken(userId) {
-    return this.accessTokens.get(userId);
+  async getStoredAccessToken(userId) {
+    const user = await User.findByPk(userId);
+    if (!user || !user.tiktok_auth_token) return null;
+    return {
+      access_token: user.tiktok_access_token,
+      refresh_token: user.tiktok_refresh_token,
+      expires_at: user.tiktok_expires_at,
+    };
   }
 
   async refreshAccessToken(userId) {
@@ -406,14 +432,22 @@ class TikTokService {
     }
 
     try {
-      const response = await axios.post(`${this.baseURL}/v2/oauth/token/`, {
+      const body = new URLSearchParams({
         client_key: this.clientKey,
         client_secret: this.clientSecret,
         grant_type: "refresh_token",
         refresh_token: tokenData.refresh_token,
       });
 
-      this.storeAccessToken(userId, response.data);
+      const response = await axios.post(
+        `${this.baseURL}/v2/oauth/token/`,
+        body.toString(),
+        {
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        }
+      );
+
+      await this.storeAccessToken(userId, response.data);
       return response.data.access_token;
     } catch (error) {
       console.error(
@@ -426,7 +460,7 @@ class TikTokService {
 
   // Helper to get valid access token (refresh if needed)
   async getValidAccessToken(userId) {
-    const tokenData = this.getStoredAccessToken(userId);
+    const tokenData = await this.getStoredAccessToken(userId);
     if (!tokenData) {
       throw new Error("User not authenticated with TikTok");
     }
