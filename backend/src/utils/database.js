@@ -83,7 +83,7 @@ const testConnection = async () => {
 // Initialize database (create tables)
 const initDatabase = async () => {
   try {
-    await sequelize.sync({ force: true });
+    await sequelize.sync({ force: false });
     console.log("✅ Database tables synced!");
   } catch (error) {
     console.error("❌ Error syncing database:", error);
