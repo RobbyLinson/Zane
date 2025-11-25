@@ -50,7 +50,7 @@ const User = sequelize.define(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
-    tiktok_auth_token: {
+    tiktok_access_token: {
       type: DataTypes.STRING,
       allowNull: true,
     },
