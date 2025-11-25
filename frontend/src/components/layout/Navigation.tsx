@@ -183,7 +183,7 @@ export const Navigation: React.FC<NavigationProps> = ({
                           View Details
                         </button>
 
-                        {user?.user_type === "creator" && (
+                        {user?.user_type === "creator" && !tiktokVerified && (
                           <button
                             onClick={handleVerifyTikTok}
                             disabled={verifyingTikTok}
