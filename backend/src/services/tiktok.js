@@ -91,7 +91,7 @@ class TikTokService {
 
       await this.storeAccessToken(userId, response.data);
 
-      await User.updatee(
+      await User.update(
         { tiktok_code_verifier: null },
         { where: { id: userId } }
       );
