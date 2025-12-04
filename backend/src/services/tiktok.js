@@ -417,7 +417,7 @@ class TikTokService {
 
   async getStoredAccessToken(userId) {
     const user = await User.findByPk(userId);
-    if (!user || !user.tiktok_auth_token) return null;
+    if (!user) return null;
     return {
       access_token: user.tiktok_access_token,
       refresh_token: user.tiktok_refresh_token,
@@ -426,7 +426,7 @@ class TikTokService {
   }
 
   async refreshAccessToken(userId) {
-    const tokenData = this.getStoredAccessToken(userId);
+    const tokenData = await this.getStoredAccessToken(userId);
     if (!tokenData || !tokenData.refresh_token) {
       throw new Error("No refresh token available");
     }
