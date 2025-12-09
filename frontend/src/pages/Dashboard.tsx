@@ -1,4 +1,12 @@
 import React from "react";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import PaidIcon from "@mui/icons-material/Paid";
+import DashboardIcon from "@mui/icons-material/Dashboard";
+import BarChartIcon from "@mui/icons-material/BarChart";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import SearchIcon from "@mui/icons-material/Search";
 import { useAuth } from "../contexts/AuthContext";
 
 interface DashboardProps {
@@ -12,19 +20,32 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     {
       title: "Available Contracts",
       value: "12",
-      color: "blue",
+      color: "var(--primary-500)",
+      icon: (
+        <AssignmentIcon
+          fontSize="medium"
+          style={{ color: "var(--primary-500)" }}
+        />
+      ),
       action: () => onNavigate("contracts"),
     },
     {
       title: "Active Campaigns",
       value: "3",
-      color: "green",
+      color: "var(--secondary-200)",
+      icon: (
+        <CampaignIcon
+          fontSize="medium"
+          style={{ color: "var(--secondary-200)" }}
+        />
+      ),
       action: () => onNavigate("campaigns"),
     },
     {
       title: "Total Earned",
       value: "€245",
-      color: "purple",
+      color: "var(--text-50)",
+      icon: <PaidIcon fontSize="medium" style={{ color: "var(--text-50)" }} />,
       action: () => onNavigate("earnings"),
     },
   ];
@@ -33,19 +54,37 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     {
       title: "Active Contracts",
       value: "5",
-      color: "blue",
+      color: "var(--primary-500)",
+      icon: (
+        <AssignmentIcon
+          fontSize="medium"
+          style={{ color: "var(--primary-500)" }}
+        />
+      ),
       action: () => onNavigate("contracts"),
     },
     {
       title: "Total Creators",
       value: "28",
-      color: "green",
+      color: "var(--secondary-200)",
+      icon: (
+        <CampaignIcon
+          fontSize="medium"
+          style={{ color: "var(--secondary-200)" }}
+        />
+      ),
       action: () => onNavigate("campaigns"),
     },
     {
       title: "Total Spend",
       value: "€1,250",
-      color: "red",
+      color: "var(--accent-500)",
+      icon: (
+        <CreditCardIcon
+          fontSize="medium"
+          style={{ color: "var(--accent-500)" }}
+        />
+      ),
       action: () => onNavigate("payouts"),
     },
   ];
@@ -53,13 +92,13 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const stats = user?.user_type === "creator" ? creatorStats : brandStats;
 
   return (
-    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-      <div className="px-4 py-6 sm:px-0">
-        <div className="mb-8">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Welcome back, {user?.first_name}! 👋
+    <div className="mt-12 min-h-screen bg-gradient-to-br from-[var(--primary-700)] to-[var(--secondary-700)]">
+      <div className="w-full max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        <div className="px-4 py-6 sm:px-0">
+          <h2 className="text-2xl font-bold text-[var(--text-100)]">
+            Welcome back {user?.first_name}!
           </h2>
-          <p className="text-gray-600 mt-1">
+          <p className="text-[var(--text-300)] mt-1">
             {user?.user_type === "creator"
               ? "Ready to find your next campaign?"
               : "Here's how your campaigns are performing."}
@@ -71,19 +110,24 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             <div
               key={index}
               onClick={stat.action}
-              className={`bg-white overflow-hidden shadow rounded-lg cursor-pointer hover:shadow-lg transition-shadow border-l-4 border-${stat.color}-500`}
+              className="bg-[var(--background-700)] overflow-hidden shadow rounded-lg cursor-pointer hover:shadow-lg transition-shadow border-l-4"
+              style={{ borderLeftColor: stat.color }}
             >
               <div className="p-6">
                 <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600 truncate">
-                      {stat.title}
-                    </p>
-                    <p
-                      className={`text-3xl font-semibold text-${stat.color}-600 mt-2`}
-                    >
-                      {stat.value}
-                    </p>
+                  <div className="flex items-center">
+                    <span className="mr-3">{stat.icon}</span>
+                    <div>
+                      <p className="text-sm font-medium text-[var(--text-300)] truncate">
+                        {stat.title}
+                      </p>
+                      <p
+                        className="text-3xl font-semibold mt-2"
+                        style={{ color: stat.color }}
+                      >
+                        {stat.value}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -92,8 +136,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="bg-[var(--background-700)] shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-[var(--text-100)] mb-4">
               {user?.user_type === "creator"
                 ? "Recent Opportunities"
                 : "Recent Activity"}
@@ -102,20 +146,25 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
-                  className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                  className="flex items-center space-x-3 p-3 bg-[var(--background-600)] rounded-lg"
                 >
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 text-sm">📄</span>
+                    <div className="w-8 h-8 bg-[var(--primary-500)] rounded-full flex items-center justify-center">
+                      <DashboardIcon
+                        fontSize="small"
+                        style={{ color: "#fff" }}
+                      />
                     </div>
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900">
+                    <p className="text-sm font-medium text-[var(--text-100)]">
                       {user?.user_type === "creator"
                         ? `New contract: Skincare product promotion`
                         : `Creator accepted: Fitness campaign`}
                     </p>
-                    <p className="text-xs text-gray-500">2 hours ago</p>
+                    <p className="text-xs text-[var(--text-300)]">
+                      2 hours ago
+                    </p>
                   </div>
                 </div>
               ))}
@@ -126,14 +175,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   user?.user_type === "creator" ? "contracts" : "campaigns"
                 )
               }
-              className="mt-4 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="mt-4 text-sm text-[var(--secondary-200)] hover:text-[var(--primary-500)] font-medium"
             >
               View all →
             </button>
           </div>
 
-          <div className="bg-white shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">
+          <div className="bg-[var(--background-700)] shadow rounded-lg p-6">
+            <h3 className="text-lg font-medium text-[var(--text-100)] mb-4">
               Quick Actions
             </h3>
             <div className="space-y-3">
@@ -141,15 +190,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <>
                   <button
                     onClick={() => onNavigate("contracts")}
-                    className="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                    className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
-                      <span className="text-blue-600 mr-3">🔍</span>
+                      <span className="mr-3">
+                        <SearchIcon
+                          fontSize="small"
+                          style={{ color: "var(--primary-500)" }}
+                        />
+                      </span>
                       <div>
-                        <p className="font-medium text-blue-900">
+                        <p className="font-medium text-[var(--primary-500)]">
                           Browse Contracts
                         </p>
-                        <p className="text-sm text-blue-600">
+                        <p className="text-sm text-[var(--text-300)]">
                           Find new opportunities
                         </p>
                       </div>
@@ -157,15 +211,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </button>
                   <button
                     onClick={() => onNavigate("campaigns")}
-                    className="w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors"
+                    className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
-                      <span className="text-green-600 mr-3">📊</span>
+                      <span className="mr-3">
+                        <CampaignIcon
+                          fontSize="small"
+                          style={{ color: "var(--secondary-200)" }}
+                        />
+                      </span>
                       <div>
-                        <p className="font-medium text-green-900">
+                        <p className="font-medium text-[var(--secondary-200)]">
                           Track Campaigns
                         </p>
-                        <p className="text-sm text-green-600">
+                        <p className="text-sm text-[var(--text-300)]">
                           Monitor your progress
                         </p>
                       </div>
@@ -176,15 +235,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 <>
                   <button
                     onClick={() => onNavigate("contracts")}
-                    className="w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
+                    className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
-                      <span className="text-blue-600 mr-3">➕</span>
+                      <span className="mr-3">
+                        <AddCircleIcon
+                          fontSize="small"
+                          style={{ color: "var(--primary-500)" }}
+                        />
+                      </span>
                       <div>
-                        <p className="font-medium text-blue-900">
+                        <p className="font-medium text-[var(--primary-500)]">
                           Create Contract
                         </p>
-                        <p className="text-sm text-blue-600">
+                        <p className="text-sm text-[var(--text-300)]">
                           Start a new campaign
                         </p>
                       </div>
@@ -192,15 +256,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                   </button>
                   <button
                     onClick={() => onNavigate("campaigns")}
-                    className="w-full text-left p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors"
+                    className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
-                      <span className="text-purple-600 mr-3">📈</span>
+                      <span className="mr-3">
+                        <BarChartIcon
+                          fontSize="small"
+                          style={{ color: "var(--accent-500)" }}
+                        />
+                      </span>
                       <div>
-                        <p className="font-medium text-purple-900">
+                        <p className="font-medium text-[var(--accent-500)]">
                           View Analytics
                         </p>
-                        <p className="text-sm text-purple-600">
+                        <p className="text-sm text-[var(--text-300)]">
                           Track performance
                         </p>
                       </div>

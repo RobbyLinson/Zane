@@ -34,12 +34,13 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
     fetchContract();
   }, [campaign.contract_id]);
 
+  // Updated color scheme to match Dashboard
   const statusColors: Record<Campaign["status"], string> = {
-    accepted: "bg-blue-100 text-blue-800",
-    content_created: "bg-yellow-100 text-yellow-800",
-    tracking: "bg-purple-100 text-purple-800",
-    completed: "bg-green-100 text-green-800",
-    paid: "bg-gray-100 text-gray-800",
+    accepted: "bg-[var(--primary-500)] text-white",
+    content_created: "bg-[var(--secondary-200)] text-[var(--primary-700)]",
+    tracking: "bg-[var(--accent-500)] text-white",
+    completed: "bg-[var(--success-500,#22c55e)] text-white",
+    paid: "bg-[var(--background-600)] text-[var(--text-100)]",
   };
 
   // Submit TikTok content handler
@@ -60,129 +61,158 @@ export const CampaignCard: React.FC<CampaignCardProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow">
-      <div className="flex justify-between items-start mb-2">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-            {contract ? contract.title : "Loading..."}
-          </h3>
-          {userType === "brand" && campaign.creator && (
-            <p className="text-sm text-gray-600">
-              Creator: {campaign.creator.first_name}{" "}
-              {campaign.creator.last_name}
-            </p>
+    <div className="bg-[var(--background-700)] rounded-xl shadow-lg p-6 border border-[var(--background-600)] hover:shadow-xl transition-shadow flex flex-col justify-between min-h-[260px]">
+      <div>
+        <div className="flex justify-between items-center mb-2">
+          <div>
+            <h3 className="text-lg font-bold text-[var(--text-100)] mb-1 truncate">
+              {contract ? contract.title : "Loading..."}
+            </h3>
+            {userType === "brand" && campaign.creator && (
+              <p className="text-xs text-[var(--text-300)]">
+                Creator: {campaign.creator.first_name}{" "}
+                {campaign.creator.last_name}
+              </p>
+            )}
+          </div>
+          <span
+            className={`px-3 py-1 text-xs font-semibold rounded-full ${
+              statusColors[campaign.status] ||
+              "bg-[var(--background-600)] text-[var(--text-100)]"
+            }`}
+          >
+            {campaign.status.replace("_", " ")}
+          </span>
+        </div>
+
+        {contract && contract.platform && (
+          <div className="text-xs text-[var(--text-300)] mb-2 capitalize">
+            Platform: {contract.platform}
+          </div>
+        )}
+
+        <div className="mb-2">
+          {userType === "creator" ? (
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[var(--text-300)]">
+                  Views tracked
+                </span>
+                <span className="text-sm font-medium text-[var(--primary-500)]">
+                  {campaign.views_tracked.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[var(--text-300)]">
+                  Amount earned
+                </span>
+                <span className="text-sm font-medium text-[var(--text-50)]">
+                  €{campaign.amount_earned}
+                </span>
+              </div>
+              {campaign.content_url ? (
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-[var(--text-300)]">
+                    Content
+                  </span>
+                  <a
+                    href={campaign.content_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--secondary-500)] underline font-medium"
+                  >
+                    View
+                  </a>
+                </div>
+              ) : (
+                campaign.status === "accepted" && (
+                  <div className="mt-2">
+                    <button
+                      className="text-[var(--primary-500)] underline text-sm mb-2 font-medium"
+                      onClick={() => setShowContentForm((v) => !v)}
+                    >
+                      {showContentForm ? "Cancel" : "Submit TikTok Content"}
+                    </button>
+                    {showContentForm && (
+                      <form onSubmit={handleSubmitContent} className="mt-2">
+                        <input
+                          type="url"
+                          required
+                          placeholder="Paste your TikTok video URL"
+                          value={tiktokUrl}
+                          onChange={(e) => setTiktokUrl(e.target.value)}
+                          className="border px-2 py-1 rounded w-full mb-2 bg-[var(--background-600)] text-[var(--text-100)]"
+                          disabled={submitting}
+                        />
+                        <button
+                          type="submit"
+                          className="bg-[var(--primary-500)] text-white px-3 py-1 rounded text-sm font-semibold shadow"
+                          disabled={submitting}
+                        >
+                          {submitting ? "Submitting..." : "Submit"}
+                        </button>
+                        {error && (
+                          <div className="text-red-500 text-xs mt-1">
+                            {error}
+                          </div>
+                        )}
+                      </form>
+                    )}
+                  </div>
+                )
+              )}
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[var(--text-300)]">Content</span>
+                {campaign.content_url ? (
+                  <a
+                    href={campaign.content_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-[var(--primary-500)] underline font-medium"
+                  >
+                    View
+                  </a>
+                ) : (
+                  <span className="text-sm text-[var(--text-300)]">
+                    Not submitted
+                  </span>
+                )}
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[var(--text-300)]">Views</span>
+                <span className="text-sm font-medium text-[var(--primary-500)]">
+                  {campaign.views_tracked.toLocaleString()}
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-sm text-[var(--text-300)]">Earned</span>
+                <span className="text-sm font-medium text-[var(--accent-500)]">
+                  €{campaign.amount_earned}
+                </span>
+              </div>
+              {campaign.content_submitted_at && (
+                <div className="flex justify-between items-center">
+                  <span className="text-xs text-[var(--text-300)]">
+                    Submitted
+                  </span>
+                  <span className="text-xs text-[var(--text-100)]">
+                    {new Date(
+                      campaign.content_submitted_at
+                    ).toLocaleDateString()}
+                  </span>
+                </div>
+              )}
+            </div>
           )}
         </div>
-        <span
-          className={`px-2 py-1 text-xs rounded-full ${
-            statusColors[campaign.status] || "bg-gray-100 text-gray-800"
-          }`}
-        >
-          {campaign.status.replace("_", " ")}
-        </span>
       </div>
-
-      {contract && contract.platform && (
-        <div className="text-xs text-gray-500 mb-2 capitalize">
-          Platform: {contract.platform}
-        </div>
-      )}
-
-      <div className="mb-2">
-        {userType === "creator" ? (
-          <>
-            <p className="text-sm text-gray-700">
-              Views tracked: {campaign.views_tracked.toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-700">
-              Amount earned: €{campaign.amount_earned}
-            </p>
-            {campaign.content_url ? (
-              <p className="text-sm text-gray-700">
-                Content URL:{" "}
-                <a
-                  href={campaign.content_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  View Content
-                </a>
-              </p>
-            ) : (
-              // Show submit TikTok content form if not submitted
-              campaign.status === "accepted" && (
-                <>
-                  <button
-                    className="text-blue-600 underline text-sm mb-2"
-                    onClick={() => setShowContentForm((v) => !v)}
-                  >
-                    {showContentForm ? "Cancel" : "Submit TikTok Content"}
-                  </button>
-                  {showContentForm && (
-                    <form onSubmit={handleSubmitContent} className="mt-2">
-                      <input
-                        type="url"
-                        required
-                        placeholder="Paste your TikTok video URL"
-                        value={tiktokUrl}
-                        onChange={(e) => setTiktokUrl(e.target.value)}
-                        className="border px-2 py-1 rounded w-full mb-2"
-                        disabled={submitting}
-                      />
-                      <button
-                        type="submit"
-                        className="bg-blue-600 text-white px-3 py-1 rounded text-sm"
-                        disabled={submitting}
-                      >
-                        {submitting ? "Submitting..." : "Submit"}
-                      </button>
-                      {error && (
-                        <div className="text-red-500 text-xs mt-1">{error}</div>
-                      )}
-                    </form>
-                  )}
-                </>
-              )
-            )}
-          </>
-        ) : (
-          <>
-            <p className="text-sm text-gray-700">
-              Content URL:{" "}
-              {campaign.content_url ? (
-                <a
-                  href={campaign.content_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline"
-                >
-                  View Content
-                </a>
-              ) : (
-                "Not submitted"
-              )}
-            </p>
-            <p className="text-sm text-gray-700">
-              Views: {campaign.views_tracked.toLocaleString()}
-            </p>
-            <p className="text-sm text-gray-700">
-              Earned: €{campaign.amount_earned}
-            </p>
-            {campaign.content_submitted_at && (
-              <p className="text-xs text-gray-500">
-                Submitted:{" "}
-                {new Date(campaign.content_submitted_at).toLocaleDateString()}
-              </p>
-            )}
-          </>
-        )}
-      </div>
-
       {onView && (
         <button
           onClick={() => onView(campaign)}
-          className="mt-2 px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+          className="mt-4 px-3 py-1 text-sm text-[var(--text-300)] hover:text-[var(--primary-500)] font-medium rounded"
         >
           View Details
         </button>

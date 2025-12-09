@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
+import PaidIcon from "@mui/icons-material/Paid";
+import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 export const Payouts: React.FC = () => {
   const [maxPayout, setMaxPayout] = useState<number>(0);
@@ -48,41 +50,59 @@ export const Payouts: React.FC = () => {
   };
 
   return (
-    <div className="p-6 max-w-xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Payouts</h1>
-      <div className="bg-white rounded-lg shadow p-6 mb-6">
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-gray-600">Maximum Possible Earnings:</span>
-          <span className="text-lg font-semibold text-green-700">
-            ${maxPayout.toFixed(2)}
-          </span>
+    <div className="min-h-screen bg-gradient-to-br from-[var(--primary-700)] to-[var(--secondary-700)] flex items-center justify-center">
+      <div className="p-8 max-w-xl w-full mx-auto bg-[var(--background-700)] rounded-xl shadow-lg">
+        <h1 className="text-2xl font-bold mb-8 text-[var(--text-100)] flex items-center">
+          <PaidIcon className="mr-2" style={{ color: "var(--accent-500)" }} />
+          Payouts
+        </h1>
+        <div className="bg-[var(--background-600)] rounded-lg shadow p-6 mb-6">
+          <div className="flex justify-between items-center mb-4">
+            <span className="flex items-center text-[var(--text-300)]">
+              <PaidIcon
+                className="mr-2"
+                style={{ color: "var(--accent-500)" }}
+              />
+              Maximum Possible Earnings
+            </span>
+            <span className="text-xl font-semibold text-[var(--text-50)]">
+              €{maxPayout.toFixed(2)}
+            </span>
+          </div>
+          <div className="flex justify-between items-center mb-4">
+            <span className="flex items-center text-[var(--text-300)]">
+              <CreditCardIcon
+                className="mr-2"
+                style={{ color: "var(--primary-500)" }}
+              />
+              Currently Available
+            </span>
+            <span className="text-xl font-semibold text-[var(--primary-500)]">
+              €{currentPayout.toFixed(2)}
+            </span>
+          </div>
+          <button
+            className={`w-full py-2 mt-4 rounded font-semibold transition shadow text-white ${
+              currentPayout > 0 && !withdrawn
+                ? "bg-[var(--primary-500)] hover:bg-[var(--primary-700)]"
+                : "bg-[var(--background-600)] cursor-not-allowed text-[var(--text-300)]"
+            }`}
+            disabled={currentPayout === 0 || isWithdrawing || withdrawn}
+            onClick={handleWithdraw}
+          >
+            {isWithdrawing
+              ? "Transferring..."
+              : withdrawn
+              ? "Transferred!"
+              : "Withdraw to My Account"}
+          </button>
         </div>
-        <div className="flex justify-between items-center mb-4">
-          <span className="text-gray-600">Currently Available:</span>
-          <span className="text-lg font-semibold text-blue-700">
-            ${currentPayout.toFixed(2)}
-          </span>
-        </div>
-        <button
-          className={`w-full py-2 mt-4 rounded text-white font-semibold transition ${
-            currentPayout > 0 && !withdrawn
-              ? "bg-blue-600 hover:bg-blue-700"
-              : "bg-gray-400 cursor-not-allowed"
-          }`}
-          disabled={currentPayout === 0 || isWithdrawing || withdrawn}
-          onClick={handleWithdraw}
-        >
-          {isWithdrawing
-            ? "Transferring..."
-            : withdrawn
-            ? "Transferred!"
-            : "Withdraw to My Account"}
-        </button>
+        <p className="text-[var(--text-300)] text-sm text-center">
+          Your available balance is based on your campaign performance.
+          <br />
+          Withdrawals are processed instantly.
+        </p>
       </div>
-      <p className="text-gray-500 text-sm">
-        Your available balance is based on your campaign performance.
-        Withdrawals are processed instantly.
-      </p>
     </div>
   );
 };

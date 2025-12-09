@@ -62,15 +62,15 @@ export const Campaigns: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="mt-12 min-h-screen bg-gradient-to-br from-[var(--primary-700)] to-[var(--secondary-700)]">
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">
+              <h1 className="text-2xl font-bold text-[var(--text-100)]">
                 {isCreator ? "Active Campaigns" : "Campaign Analytics"}
               </h1>
-              <p className="text-gray-600 mt-1">
+              <p className="text-[var(--text-300)] mt-1">
                 {isCreator
                   ? "Track your accepted campaigns and earnings"
                   : "View analytics for all creator campaigns"}
@@ -78,7 +78,7 @@ export const Campaigns: React.FC = () => {
             </div>
             {isCreator && (
               <button
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="bg-[var(--primary-500)] text-white px-4 py-2 rounded hover:bg-[var(--primary-700)] shadow"
                 onClick={handleUpdateViews}
                 disabled={loading}
               >
@@ -88,11 +88,13 @@ export const Campaigns: React.FC = () => {
           </div>
 
           {loading ? (
-            <div className="text-center text-gray-600">
+            <div className="text-center text-[var(--text-300)]">
               Loading campaigns...
             </div>
           ) : campaigns.length === 0 ? (
-            <div className="text-center text-gray-600">No campaigns found.</div>
+            <div className="text-center text-[var(--text-300)]">
+              No campaigns found.
+            </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {campaigns.map((campaign) => (

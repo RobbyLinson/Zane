@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion"; // Add this import
 import { useAuth } from "../../contexts/AuthContext";
 import type { RegisterData } from "../../types";
 
@@ -19,8 +20,41 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   const { register } = useAuth();
+
+  useEffect(() => {
+    const errors: string[] = [];
+    const { password, first_name, last_name } = formData;
+
+    if (password.length < 8) {
+      errors.push("Password must be longer than 8 characters.");
+    }
+    if (
+      first_name &&
+      password.toLowerCase().includes(first_name.toLowerCase())
+    ) {
+      errors.push("Password should not contain your first name.");
+    }
+    if (last_name && password.toLowerCase().includes(last_name.toLowerCase())) {
+      errors.push("Password should not contain your last name.");
+    }
+    if (!/[A-Z]/.test(password)) {
+      errors.push("Password must include a capital letter.");
+    }
+    if (!/[0-9]/.test(password)) {
+      errors.push("Password must include a number.");
+    }
+    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
+      errors.push("Password must include a special character.");
+    }
+    if (password.toLowerCase().includes("password")) {
+      errors.push('Password should not include the word "password".');
+    }
+    setPasswordErrors(errors);
+  }, [formData, formData.password, formData.first_name, formData.last_name]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -33,6 +67,20 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     e.preventDefault();
     setError("");
     setLoading(true);
+
+    // Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError("Please enter a valid email address.");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.password !== confirmPassword) {
+      setError("Passwords do not match.");
+      setLoading(false);
+      return;
+    }
 
     try {
       await register(formData);
@@ -48,9 +96,9 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
-        Sign Up
+    <div className="bg-[var(--background-700)] p-8 rounded-lg shadow-lg w-full max-w-md">
+      <h2 className="text-2xl font-bold text-[var(--text-100)] text-center">
+        Sign Up for <span className="text-[var(--primary-500)]">Zane</span>
       </h2>
 
       {error && (
@@ -61,14 +109,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
             I am a...
           </label>
           <select
             name="user_type"
             value={formData.user_type}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
           >
             <option value="creator">Creator</option>
             <option value="brand">Brand</option>
@@ -77,7 +125,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
               First Name
             </label>
             <input
@@ -85,12 +133,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               name="first_name"
               value={formData.first_name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
               required
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
               Last Name
             </label>
             <input
@@ -98,7 +146,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               name="last_name"
               value={formData.last_name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
               required
             />
           </div>
@@ -106,7 +154,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
         {formData.user_type === "brand" && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
               Company Name
             </label>
             <input
@@ -114,14 +162,14 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
               name="company_name"
               value={formData.company_name}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
               required
             />
           </div>
         )}
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
             Email
           </label>
           <input
@@ -129,13 +177,13 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
             required
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
             Password
           </label>
           <input
@@ -143,26 +191,63 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
             required
             minLength={6}
           />
+          <AnimatePresence>
+            {formData.password && passwordErrors.length > 0 && (
+              <motion.ul
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mt-2 text-sm text-red-500 space-y-1"
+              >
+                {passwordErrors.map((err, idx) => (
+                  <li key={idx}>{err}</li>
+                ))}
+              </motion.ul>
+            )}
+          </AnimatePresence>
         </div>
+
+        <AnimatePresence>
+          {formData.password && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                name="confirm_password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
+                required
+                minLength={6}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-[var(--primary-500)] text-white py-2 px-4 rounded-md hover:bg-[var(--primary-700)] disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Creating Account..." : "Create Account"}
         </button>
       </form>
 
-      <p className="text-center text-sm text-gray-600 mt-4">
+      <p className="text-center text-sm text-[var(--text-300)] mt-4">
         Already have an account?{" "}
         <button
           onClick={onSwitchToLogin}
-          className="text-blue-500 hover:text-blue-600 font-medium"
+          className="text-[var(--secondary-200)] hover:text-blue-600 font-medium"
         >
           Login
         </button>
