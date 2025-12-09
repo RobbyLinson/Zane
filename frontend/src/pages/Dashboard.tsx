@@ -8,6 +8,7 @@ import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAuth } from "../contexts/AuthContext";
+import { api } from "../services/api";
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
@@ -16,10 +17,52 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const { user } = useAuth();
 
+  const [numContracts, setNumContracts] = React.useState<number>(0);
+  const [numCampaigns, setNumCampaigns] = React.useState<number>(0);
+  const [currentPayout, setCurrentPayout] = React.useState<number>(0);
+
+  React.useEffect(() => {
+    const fetchNumContracts = async () => {
+      try {
+        const data = await api.getNumAvailableContracts();
+        setNumContracts(data.count || 0);
+      } catch (err) {
+        setNumContracts(0);
+        console.error("Failed to load number of contracts:", err);
+      }
+    };
+    fetchNumContracts();
+  }, []);
+
+  React.useEffect(() => {
+    const fetchNumCampaigns = async () => {
+      try {
+        if (user) {
+          const data = await api.getCampaignCountByUser(user.id);
+          setNumCampaigns(data.count || 0);
+        }
+      } catch (err) {
+        setNumCampaigns(0);
+        console.error("Failed to load number of campaigns:", err);
+      }
+    };
+    const fetchCurrentPayout = async () => {
+      try {
+        const response = await api.getCurrentPayout();
+        setCurrentPayout(response.totalCurrentPayout || 0);
+      } catch (err) {
+        setCurrentPayout(0);
+        console.error("Failed to load max payout:", err);
+      }
+    };
+    fetchNumCampaigns();
+    fetchCurrentPayout();
+  }, [user]);
+
   const creatorStats = [
     {
       title: "Available Contracts",
-      value: "12",
+      value: numContracts !== null ? numContracts.toString() : "...",
       color: "var(--primary-500)",
       icon: (
         <AssignmentIcon
@@ -31,7 +74,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     },
     {
       title: "Active Campaigns",
-      value: "3",
+      value: numCampaigns !== null ? numCampaigns.toString() : "...",
       color: "var(--secondary-200)",
       icon: (
         <CampaignIcon
@@ -43,7 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     },
     {
       title: "Total Earned",
-      value: "€245",
+      value: `€${currentPayout.toFixed(2)}`,
       color: "var(--text-50)",
       icon: <PaidIcon fontSize="medium" style={{ color: "var(--text-50)" }} />,
       action: () => onNavigate("earnings"),
@@ -78,12 +121,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     {
       title: "Total Spend",
       value: "€1,250",
-      color: "var(--accent-500)",
+      color: "var(--text-50)",
       icon: (
-        <CreditCardIcon
-          fontSize="medium"
-          style={{ color: "var(--accent-500)" }}
-        />
+        <CreditCardIcon fontSize="medium" style={{ color: "var(--text-50)" }} />
       ),
       action: () => onNavigate("payouts"),
     },
@@ -142,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                 ? "Recent Opportunities"
                 : "Recent Activity"}
             </h3>
-            <div className="space-y-3">
+            {/* <div className="space-y-3">
               {[1, 2, 3].map((i) => (
                 <div
                   key={i}
@@ -178,7 +218,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               className="mt-4 text-sm text-[var(--secondary-200)] hover:text-[var(--primary-500)] font-medium"
             >
               View all →
-            </button>
+            </button> */}
           </div>
 
           <div className="bg-[var(--background-700)] shadow rounded-lg p-6">
@@ -262,11 +302,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                       <span className="mr-3">
                         <BarChartIcon
                           fontSize="small"
-                          style={{ color: "var(--accent-500)" }}
+                          style={{ color: "var(--text-50)" }}
                         />
                       </span>
                       <div>
-                        <p className="font-medium text-[var(--accent-500)]">
+                        <p className="font-medium text-[var(--text-50)]">
                           View Analytics
                         </p>
                         <p className="text-sm text-[var(--text-300)]">

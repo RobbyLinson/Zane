@@ -94,6 +94,10 @@ class ApiService {
     return this.request(`/contracts/${id}`);
   }
 
+  async getNumAvailableContracts() {
+    return this.request("/contracts/countAvailable");
+  }
+
   async createContract(contractData: CreateContractData) {
     return this.request("/contracts", {
       method: "POST",
@@ -131,6 +135,10 @@ class ApiService {
 
   async getCampaignsByUser(userId: string) {
     return this.request(`/campaigns/user/${userId}`);
+  }
+
+  async getCampaignCountByUser(userId: string) {
+    return this.request(`/campaigns/user/${userId}/count`);
   }
 
   async getMaxPayout() {

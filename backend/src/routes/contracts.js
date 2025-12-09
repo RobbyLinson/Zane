@@ -2,6 +2,7 @@ const express = require("express");
 const {
   createContract,
   getContracts,
+  getNumAvailableContracts,
   getContract,
   updateContract,
   acceptContract,
@@ -15,6 +16,8 @@ router.use(authenticateToken);
 
 // Get contracts (different views for brands vs creators)
 router.get("/", getContracts);
+
+router.get("/countAvailable", getNumAvailableContracts);
 
 // Get single contract
 router.get("/:id", getContract);

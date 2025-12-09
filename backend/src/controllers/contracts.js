@@ -160,6 +160,40 @@ const getContracts = async (req, res) => {
   }
 };
 
+const getNumAvailableContracts = async (req, res) => {
+  try {
+    // Count contracts that are active, not expired, and have available campaign slots (unclaimed)
+    const now = new Date();
+    const { Op, fn, col, literal } = require("sequelize");
+    const contracts = await Contract.findAll({
+      where: {
+        status: "active",
+        [Op.or]: [{ expires_at: null }, { expires_at: { [Op.gt]: now } }],
+      },
+      include: [
+        {
+          model: require("../models").Campaign,
+          as: "campaigns",
+          required: false,
+        },
+      ],
+    });
+
+    // Only count contracts where number of campaigns < num_campaigns
+    const availableContracts = contracts.filter((contract) => {
+      const numCampaigns = contract.campaigns ? contract.campaigns.length : 0;
+      return numCampaigns < contract.num_campaigns;
+    });
+
+    res.json({ count: availableContracts.length });
+  } catch (error) {
+    console.error("Get number of contracts error:", error);
+    res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};
+
 // Get single contract
 const getContract = async (req, res) => {
   try {
@@ -299,6 +333,7 @@ const acceptContract = async (req, res) => {
 
 module.exports = {
   createContract,
+  getNumAvailableContracts,
   getContracts,
   getContract,
   updateContract,

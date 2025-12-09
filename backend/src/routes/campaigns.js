@@ -6,6 +6,7 @@ const {
   updateCampaign,
   deleteCampaign,
   getCampaignsByUser,
+  getCampaignCountByUser,
   getMaxPayout,
   getCurrentPayout,
   withdrawUserBalance,
@@ -19,6 +20,7 @@ router.use(authenticateToken);
 router.post("/", requireUserType("creator"), createCampaign);
 router.get("/", getCampaigns);
 router.get("/user/:userId", getCampaignsByUser);
+router.get("/user/:userId/count", getCampaignCountByUser);
 router.get("/max-payout", getMaxPayout);
 router.get("/current-payout", getCurrentPayout);
 router.get("/:id", getCampaign);

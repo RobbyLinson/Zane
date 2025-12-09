@@ -148,6 +148,19 @@ const getCampaignsByUser = async (req, res) => {
   }
 };
 
+const getCampaignCountByUser = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const count = await Campaign.count({
+      where: { creator_id: userId },
+    });
+    res.json({ count });
+  } catch (error) {
+    console.error("Get campaign count by user error:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 const getMaxPayout = async (req, res) => {
   try {
     const userId = req.user.userId;
@@ -284,6 +297,7 @@ module.exports = {
   updateCampaign,
   deleteCampaign,
   getCampaignsByUser,
+  getCampaignCountByUser,
   getMaxPayout,
   getCurrentPayout,
   withdrawUserBalance,
