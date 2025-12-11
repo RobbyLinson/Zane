@@ -2,13 +2,13 @@ import React from "react";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CampaignIcon from "@mui/icons-material/Campaign";
 import PaidIcon from "@mui/icons-material/Paid";
-import DashboardIcon from "@mui/icons-material/Dashboard";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
+import type { Campaign } from "../types";
 
 interface DashboardProps {
   onNavigate: (page: string) => void;
@@ -20,6 +20,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [numContracts, setNumContracts] = React.useState<number>(0);
   const [numCampaigns, setNumCampaigns] = React.useState<number>(0);
   const [currentPayout, setCurrentPayout] = React.useState<number>(0);
+  const [numBrandCampaigns, setNumBrandCampaigns] = React.useState<number>(0);
+  const [brandPayout, setBrandPayout] = React.useState<number>(0);
+  const [brandCampaigns, setBrandCampaigns] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchNumContracts = async () => {
@@ -59,6 +62,39 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     fetchCurrentPayout();
   }, [user]);
 
+  React.useEffect(() => {
+    const fetchNumBrandCampaigns = async () => {
+      try {
+        const data = await api.getBrandCampaigns();
+        const campaigns = data.campaigns || [];
+        setNumBrandCampaigns(campaigns.length);
+        setBrandCampaigns(campaigns);
+        // Calculate total spend (sum amount_earned from each campaign's contract)
+        const totalSpend = campaigns.reduce(
+          (sum: number, campaign: Campaign) => {
+            // Some campaigns may not have contract populated, so check
+            if (campaign && campaign.amount_earned) {
+              console.log("amount_earned:", campaign.amount_earned);
+              return sum + campaign.amount_earned;
+            }
+            return sum;
+          },
+          0
+        );
+        setBrandPayout(totalSpend);
+      } catch (err) {
+        setNumBrandCampaigns(0);
+        setBrandPayout(0);
+        setBrandCampaigns([]);
+        console.error("Failed to load number of brand campaigns:", err);
+      }
+    };
+    if (user?.user_type === "brand") {
+      fetchNumBrandCampaigns();
+      // console.log("Fetched brand campaigns: ", numBrandCampaigns);
+    }
+  }, [user]);
+
   const creatorStats = [
     {
       title: "Available Contracts",
@@ -96,7 +132,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const brandStats = [
     {
       title: "Active Contracts",
-      value: "5",
+      value: numContracts !== null ? numContracts.toString() : "...",
       color: "var(--primary-500)",
       icon: (
         <AssignmentIcon
@@ -107,8 +143,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       action: () => onNavigate("contracts"),
     },
     {
-      title: "Total Creators",
-      value: "28",
+      title: "Total Campaigns",
+      value: numBrandCampaigns !== null ? numBrandCampaigns.toString() : "...",
       color: "var(--secondary-200)",
       icon: (
         <CampaignIcon
@@ -120,7 +156,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     },
     {
       title: "Total Spend",
-      value: "€1,250",
+      value: `€${brandPayout.toLocaleString(undefined, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
       color: "var(--text-50)",
       icon: (
         <CreditCardIcon fontSize="medium" style={{ color: "var(--text-50)" }} />
