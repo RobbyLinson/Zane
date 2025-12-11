@@ -22,7 +22,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const [currentPayout, setCurrentPayout] = React.useState<number>(0);
   const [numBrandCampaigns, setNumBrandCampaigns] = React.useState<number>(0);
   const [brandPayout, setBrandPayout] = React.useState<number>(0);
-  const [brandCampaigns, setBrandCampaigns] = React.useState<any[]>([]);
 
   React.useEffect(() => {
     const fetchNumContracts = async () => {
@@ -68,7 +67,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
         const data = await api.getBrandCampaigns();
         const campaigns = data.campaigns || [];
         setNumBrandCampaigns(campaigns.length);
-        setBrandCampaigns(campaigns);
         // Calculate total spend (sum amount_earned from each campaign's contract)
         const totalSpend = campaigns.reduce(
           (sum: number, campaign: Campaign) => {
@@ -85,7 +83,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       } catch (err) {
         setNumBrandCampaigns(0);
         setBrandPayout(0);
-        setBrandCampaigns([]);
         console.error("Failed to load number of brand campaigns:", err);
       }
     };
