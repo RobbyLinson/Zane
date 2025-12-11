@@ -80,6 +80,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           0
         );
         setBrandPayout(totalSpend);
+        console.log(typeof brandPayout, brandPayout);
       } catch (err) {
         setNumBrandCampaigns(0);
         setBrandPayout(0);
@@ -153,7 +154,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
     },
     {
       title: "Total Spend",
-      value: `€${brandPayout.toLocaleString(undefined, {
+      value: `€${Number(brandPayout).toLocaleString(undefined, {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
