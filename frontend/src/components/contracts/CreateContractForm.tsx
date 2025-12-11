@@ -1,9 +1,18 @@
 import React, { useState } from "react";
-import { api } from "../../services/api";
-import type { CreateContractData } from "../../types";
-import { FundContractForm } from "./FundContract";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
+import { api } from "../../services/api";
+import type { CreateContractData } from "../../types";
+import PaidIcon from "@mui/icons-material/Paid";
+import CampaignIcon from "@mui/icons-material/Campaign";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import GroupIcon from "@mui/icons-material/Group";
+import NotesIcon from "@mui/icons-material/Notes";
+// import TrendingUpIcon from "@mui/icons-material/TrendingUp";
+// import InstagramIcon from "@mui/icons-material/Instagram";
+// import YouTubeIcon from "@mui/icons-material/YouTube";
+// import MusicNoteIcon from "@mui/icons-material/MusicNote";
+import { FundContractForm } from "./FundContract";
 
 const stripePromise = loadStripe(
   "pk_test_51S5Sp6DGlKLv8jZbbpa0BwpoyPfAYVgn0zjGzEDmlrRqBbiituzNro2xOtnx9z2RMqhRymUOzKZmsXyDhCOE8kNS00yYTnZgUO"
@@ -63,7 +72,6 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     e.preventDefault();
     setError("");
     setLoading(true);
-
     setShowFundModal(true);
     setLoading(false);
   };
@@ -83,358 +91,336 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     }
   };
 
-  const maxViews = Math.floor((formData.max_payout / formData.cpm_rate) * 1000);
+  const maxViews =
+    formData.cpm_rate > 0
+      ? Math.floor((formData.max_payout / formData.cpm_rate) * 1000)
+      : 0;
   const platformCut = formData.company_charge * 0.2;
   const creatorPayout = formData.company_charge * 0.8;
 
-  const platformIcons = {
-    tiktok: "🎵",
-    instagram: "📸",
-    youtube_shorts: "📺",
-  };
+  //   const platformIcons = {
+  //     tiktok: <MusicNoteIcon fontSize="medium" style={{ color: "#25F4EE" }} />,
+  //     instagram: <InstagramIcon fontSize="medium" style={{ color: "#E1306C" }} />,
+  //     youtube_shorts: (
+  //       <YouTubeIcon fontSize="medium" style={{ color: "#FF0000" }} />
+  //     ),
+  //   };
 
   return (
-    <>
-      <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-4xl max-h-screen overflow-y-auto">
-          {/* Header */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-t-2xl">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-2xl font-bold text-white">
-                  Create Campaign Contract
-                </h2>
-                <p className="text-blue-100 mt-1">
-                  Set your budget and requirements
-                </p>
-              </div>
-              <button
-                onClick={onCancel}
-                className="text-white hover:text-gray-200 transition-colors text-2xl font-light"
-              >
-                ✕
-              </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center">
+      {/* Modal overlay for semi-transparent background */}
+      <div
+        className="absolute inset-0 bg-black bg-opacity-70 backdrop-blur-sm"
+        onClick={onCancel}
+      />
+      <div className="relative w-full max-w-3xl max-h-[90vh] mx-auto rounded-2xl shadow-2xl overflow-y-auto border border-[var(--border-900)] bg-[var(--background-700)] bg-opacity-95 backdrop-blur-md">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-[var(--primary-700)] to-[var(--secondary-700)] p-6 rounded-t-2xl">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-2xl font-bold text-[var(--text-100)] flex items-center gap-2">
+                <AssignmentIcon
+                  fontSize="medium"
+                  style={{ color: "var(--primary-500)" }}
+                />
+                Create Campaign Contract
+              </h2>
             </div>
+            <button
+              onClick={onCancel}
+              className="text-[var(--text-100)] hover:text-[var(--secondary-200)] transition-colors text-2xl font-light"
+            >
+              ×
+            </button>
           </div>
-
-          <div className="p-8">
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg mb-6">
-                <div className="flex">
-                  <div className="text-red-500 mr-3">⚠️</div>
-                  <div>{error}</div>
-                </div>
+        </div>
+        <form className="p-6" onSubmit={handleSubmit}>
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-r-lg mb-6">
+              <div className="flex">
+                <div className="text-red-500 mr-3">⚠️</div>
+                <div>{error}</div>
               </div>
-            )}
+            </div>
+          )}
+          <div className="space-y-8">
+            {/* Budget Section */}
+            <div className="bg-gradient-to-br from-[var(--primary-800)] to-[var(--secondary-800)] p-4 rounded-xl border border-[var(--primary-900)]">
+              <h3 className="text-lg font-semibold text-[var(--text-100)] mb-3 flex items-center gap-2">
+                <PaidIcon
+                  fontSize="small"
+                  style={{ color: "var(--primary-500)" }}
+                />
+                Campaign Budget
+              </h3>
 
-            <div className="space-y-8">
-              {/* Budget Section */}
-              <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                  💰 Campaign Budget
-                </h3>
-
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
-                      Total Budget: €{formData.company_charge.toLocaleString()}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="range"
-                        min="5000"
-                        max="25000"
-                        step="500"
-                        value={formData.company_charge}
-                        onChange={(e) =>
-                          handleBudgetChange(parseInt(e.target.value))
-                        }
-                        className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-                        style={{
-                          background: `linear-gradient(to right, #10b981 0%, #10b981 ${
-                            ((formData.company_charge - 5000) / 20000) * 100
-                          }%, #e5e7eb ${
-                            ((formData.company_charge - 5000) / 20000) * 100
-                          }%, #e5e7eb 100%)`,
-                        }}
-                      />
-                      <style>{`
-                      input[type="range"]::-webkit-slider-thumb {
-                        appearance: none;
-                        height: 24px;
-                        width: 24px;
-                        border-radius: 50%;
-                        background: #10b981;
-                        cursor: pointer;
-                        border: 3px solid white;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-                      }
-
-                      input[type="range"]::-moz-range-thumb {
-                        height: 24px;
-                        width: 24px;
-                        border-radius: 50%;
-                        background: #10b981;
-                        cursor: pointer;
-                        border: 3px solid white;
-                        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-                        border: none;
-                      }
-                    `}</style>
-                      <div className="flex justify-between text-sm text-gray-500 mt-2">
-                        <span>€5,000</span>
-                        <span>€25,000</span>
-                      </div>
-                    </div>
+              {/* Sliders side by side */}
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* CPM Rate Slider */}
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-200)] mb-2">
+                    CPM Rate: €{formData.cpm_rate.toLocaleString()} / 1K views
+                  </label>
+                  <input
+                    type="range"
+                    min="5"
+                    max="25"
+                    step="1"
+                    value={formData.cpm_rate}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        cpm_rate: parseFloat(e.target.value),
+                      }))
+                    }
+                    className="w-full h-2 bg-[var(--background-600)] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 0%, #10b981 ${
+                        ((formData.cpm_rate - 5) / 20) * 100
+                      }%, #23272f ${
+                        ((formData.cpm_rate - 5) / 20) * 100
+                      }%, #23272f 100%)`,
+                    }}
+                  />
+                  <div className="flex justify-between text-xs text-[var(--text-300)] mt-1">
+                    <span>€5</span>
+                    <span>€25</span>
                   </div>
+                </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Platform Fee (20%)
-                      </div>
-                      <div className="text-lg font-semibold text-gray-800">
-                        €{platformCut.toLocaleString()}
-                      </div>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg border border-gray-200">
-                      <div className="text-sm text-gray-600">
-                        Creator Payout (80%)
-                      </div>
-                      <div className="text-lg font-semibold text-green-600">
-                        €{creatorPayout.toLocaleString()}
-                      </div>
-                    </div>
+                {/* Budget Slider */}
+                <div>
+                  <label className="block text-xs font-medium text-[var(--text-200)] mb-2">
+                    Total Budget: €{formData.company_charge.toLocaleString()}
+                  </label>
+                  <input
+                    type="range"
+                    min="5000"
+                    max="25000"
+                    step="500"
+                    value={formData.company_charge}
+                    onChange={(e) =>
+                      handleBudgetChange(parseInt(e.target.value))
+                    }
+                    className="w-full h-2 bg-[var(--background-600)] rounded-lg appearance-none cursor-pointer"
+                    style={{
+                      background: `linear-gradient(to right, #10b981 0%, #10b981 ${
+                        ((formData.company_charge - 5000) / 20000) * 100
+                      }%, #23272f ${
+                        ((formData.company_charge - 5000) / 20000) * 100
+                      }%, #23272f 100%)`,
+                    }}
+                  />
+                  <div className="flex justify-between text-xs text-[var(--text-300)] mt-1">
+                    <span>€5K</span>
+                    <span>€25K</span>
                   </div>
                 </div>
               </div>
 
-              {/* Basic Info */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Campaign Title *
-                    </label>
-                    <input
-                      type="text"
-                      name="title"
-                      value={formData.title}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                      placeholder="e.g., Summer Skincare Campaign"
-                      required
-                    />
+              {/* Platform Fee, Creator Payout, Max Views */}
+              <div className="grid grid-cols-4 gap-3">
+                <div className="bg-[var(--background-600)] p-3 rounded-lg border border-[var(--border-900)]">
+                  <div className="text-xs text-[var(--text-300)] mb-1">
+                    Platform Fee
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Platform
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      {Object.entries(platformIcons).map(([platform, icon]) => (
-                        <label key={platform} className="cursor-pointer">
-                          <input
-                            type="radio"
-                            name="platform"
-                            value={platform}
-                            checked={formData.platform === platform}
-                            onChange={handleChange}
-                            className="sr-only"
-                          />
-                          <div
-                            className={`p-3 rounded-lg border-2 text-center transition-all ${
-                              formData.platform === platform
-                                ? "border-blue-500 bg-blue-50 text-blue-700"
-                                : "border-gray-200 hover:border-gray-300"
-                            }`}
-                          >
-                            <div className="text-2xl mb-1">{icon}</div>
-                            <div className="text-xs capitalize">
-                              {platform.replace("_", " ")}
-                            </div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
+                  <div className="text-base font-semibold text-[var(--text-100)]">
+                    €{platformCut.toLocaleString()}
                   </div>
+                </div>
+                <div className="bg-[var(--background-600)] p-3 rounded-lg border border-[var(--border-900)]">
+                  <div className="text-xs text-[var(--text-300)] mb-1">
+                    Creator Payout
+                  </div>
+                  <div className="text-base font-semibold text-[var(--primary-500)]">
+                    €{creatorPayout.toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-[var(--background-600)] p-3 rounded-lg border border-[var(--border-900)]">
+                  <div className="text-xs text-[var(--text-300)] mb-1">
+                    Max Views
+                  </div>
+                  <div className="text-base font-semibold text-[var(--secondary-200)]">
+                    {maxViews.toLocaleString()}
+                  </div>
+                </div>
+                <div className="bg-[var(--background-600)] p-3 rounded-lg border border-[var(--border-900)]">
+                  <label className="block text-xs text-[var(--text-300)] mb-1">
+                    Min Views
+                  </label>
+                  <input
+                    type="text"
+                    name="min_views"
+                    value={
+                      formData.min_views
+                        ? formData.min_views.toLocaleString()
+                        : "1,000"
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/,/g, "");
+                      if (value === "" || !isNaN(Number(value))) {
+                        handleChange({
+                          target: {
+                            name: "min_views",
+                            value: value,
+                          },
+                        } as React.ChangeEvent<HTMLInputElement>);
+                      }
+                    }}
+                    className="w-full text-base font-semibold text-[var(--secondary-200)] bg-transparent border-none focus:outline-none focus:ring-0 p-0"
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-0 mb-4">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
+                    Campaign Title *
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-[var(--border-900)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent bg-[var(--background-600)] text-[var(--text-100)] text-sm"
+                    placeholder="e.g., Summer Skincare Campaign"
+                    required
+                  />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
                     Campaign Description
                   </label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
-                    rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all resize-none"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-[var(--border-900)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent resize-none bg-[var(--background-600)] text-[var(--text-100)] text-sm"
                     placeholder="Describe your campaign goals and what you're looking for..."
                   />
                 </div>
               </div>
 
-              {/* Performance Settings */}
-              <div className="bg-blue-50 p-6 rounded-xl border border-blue-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                  📊 Performance & Requirements
-                </h3>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      CPM Rate (€) *
-                    </label>
-                    <input
-                      type="number"
-                      name="cpm_rate"
-                      value={formData.cpm_rate}
-                      onChange={handleChange}
-                      step="0.01"
-                      min="0.01"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                      required
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Per 1,000 views
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Max Creator Payout (€)
-                    </label>
-                    <input
-                      type="number"
-                      name="max_payout"
-                      value={formData.max_payout}
-                      onChange={handleChange}
-                      step="0.01"
-                      min="1"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent "
-                      readOnly
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Auto-calculated (80% of budget)
-                    </p>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Minimum Views
-                    </label>
-                    <input
-                      type="number"
-                      name="min_views"
-                      value={formData.min_views}
-                      onChange={handleChange}
-                      min="100"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50"
-                    />
-                  </div>
-                </div>
-
-                {formData.cpm_rate > 0 && formData.max_payout > 0 && (
-                  <div className="mt-4 p-4 bg-white rounded-lg border border-blue-200">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-sm font-medium text-gray-800">
-                          Maximum Views Paid: {maxViews.toLocaleString()}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Creator earns €{formData.cpm_rate}/1K views, up to €
-                          {formData.max_payout}
-                        </p>
-                      </div>
-                      <div className="text-2xl">📈</div>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* Additional Requirements */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    🎯 Target Audience
+                  <label className="text-sm font-medium text-[var(--text-200)] mb-1 flex items-center gap-1">
+                    <GroupIcon
+                      fontSize="small"
+                      style={{ color: "var(--secondary-200)" }}
+                    />
+                    Target Audience
                   </label>
                   <input
                     type="text"
                     name="target_audience"
                     value={formData.target_audience}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-[var(--border-900)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent bg-[var(--background-600)] text-[var(--text-100)] text-sm"
                     placeholder="e.g., Women 18-35, Fashion enthusiasts"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    📝 Content Requirements
+                  <label className="text-sm font-medium text-[var(--text-200)] mb-1 flex items-center gap-1">
+                    <NotesIcon
+                      fontSize="small"
+                      style={{ color: "var(--primary-500)" }}
+                    />
+                    Content Requirements
                   </label>
                   <textarea
                     name="content_requirements"
                     value={formData.content_requirements}
                     onChange={handleChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-3 py-2 border border-[var(--border-900)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[var(--primary-500)] focus:border-transparent resize-none bg-[var(--background-600)] text-[var(--text-100)] text-sm"
                     placeholder="Specific requirements, hashtags, mentions..."
                   />
                 </div>
               </div>
-
-              {/* Footer */}
-              <div className="flex justify-between items-center pt-6 border-t border-gray-200">
-                <div className="text-sm text-gray-500">
-                  All amounts are in EUR. Contract is subject to platform terms.
-                </div>
-                <div className="flex space-x-4">
-                  <button
-                    type="button"
-                    onClick={onCancel}
-                    className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="px-8 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium rounded-lg hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100"
-                  >
-                    {loading ? (
-                      <div className="flex items-center">
-                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                        Creating...
-                      </div>
-                    ) : (
-                      "🚀 Launch Campaign"
-                    )}
-                  </button>
-                </div>
+            </div>
+            {/* Footer */}
+            <div className="flex justify-between items-center pt-3 border-t border-[var(--border-900)] ">
+              <div className="text-sm text-[var(--text-300)]">
+                All amounts in EUR. Contract subject to platform terms.
+              </div>
+              <div className="flex space-x-4">
+                <button
+                  type="button"
+                  onClick={onCancel}
+                  className="px-6 py-3 text-[var(--text-300)] hover:text-[var(--text-100)] font-medium transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="px-8 py-3 bg-gradient-to-r from-[var(--primary-500)] to-[var(--secondary-200)] text-white font-medium rounded-lg hover:from-[var(--primary-700)] hover:to-[var(--secondary-300)] disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-105 disabled:hover:scale-100 flex items-center gap-2"
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <CampaignIcon fontSize="small" />
+                      Creating...
+                    </div>
+                  ) : (
+                    <>
+                      <CampaignIcon fontSize="small" /> Launch Campaign
+                    </>
+                  )}
+                </button>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-
-      {/* Fund Contract Modal - Separate from main modal */}
-      {showFundModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-lg p-8 shadow-lg max-w-2xl w-full mx-4">
-            <Elements stripe={stripePromise}>
-              <FundContractForm
-                contractDraft={formData}
-                onSuccess={handleFundSuccess}
-                onCancel={() => setShowFundModal(false)}
-              />
-            </Elements>
+        </form>
+        {/* Fund Contract Modal - Separate from main modal */}
+        {showFundModal && (
+          <div className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-[60]">
+            <div className="bg-[var(--background-700)] rounded-lg p-8 shadow-lg max-w-2xl w-full mx-4 border border-[var(--border-900)]">
+              <Elements stripe={stripePromise}>
+                <FundContractForm
+                  contractDraft={formData}
+                  onSuccess={handleFundSuccess}
+                  onCancel={() => setShowFundModal(false)}
+                />
+              </Elements>
+            </div>
           </div>
-        </div>
-      )}
-    </>
+        )}
+      </div>
+    </div>
   );
 };
 
 export default CreateContractForm;
+
+{
+  /* <div>
+                  <label className="block text-sm font-medium text-[var(--text-200)] mb-2">
+                    Platform
+                  </label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {Object.entries(platformIcons).map(([platform, icon]) => (
+                      <button
+                        key={platform}
+                        type="button"
+                        className={`flex flex-col items-center justify-center p-3 rounded-lg border transition-all ${
+                          formData.platform === platform
+                            ? "bg-[var(--primary-500)] border-[var(--primary-700)] text-white"
+                            : "bg-[var(--background-600)] border-[var(--border-900)] text-[var(--text-100)] hover:bg-[var(--primary-800)]"
+                        }`}
+                        onClick={() =>
+                          setFormData((prev) => ({ ...prev, platform }))
+                        }
+                      >
+                        {icon}
+                        <span className="text-xs mt-1 capitalize">
+                          {platform.replace("_", " ")}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div> */
+}
