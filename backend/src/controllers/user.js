@@ -27,8 +27,8 @@ const getStripeOnboardingLink = async (req, res) => {
     // Otherwise, generate a fresh onboarding link
     const accountLink = await generateStripeOnboardingLink(
       user.stripe_account_id,
-      `${process.env.FRONTEND_URL}/stripe/refresh`,
-      `${process.env.FRONTEND_URL}/stripe/complete`
+      `${process.env.FRONTEND_URL}`,
+      `${process.env.FRONTEND_URL}`
     );
 
     return res.json({ url: accountLink.url });
