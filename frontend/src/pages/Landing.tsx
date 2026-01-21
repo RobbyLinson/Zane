@@ -54,7 +54,7 @@ export const Landing: React.FC = () => {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
           <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
             <CardHeader>
-              <div className="w-12 h-12 border bg-[var(--accent-500)] rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 border-3 bg-[var(--accent-500)] rounded-lg flex items-center justify-center mb-4">
                 <Users className="h-6 w-6 text-white" />
               </div>
               <CardTitle>Creator Network</CardTitle>
