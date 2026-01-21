@@ -18,7 +18,7 @@ export const Campaigns: React.FC = () => {
       try {
         let response;
         if (isCreator) {
-          response = await api.getMyCampaigns(); // GET /api/campaigns
+          response = await api.getCampaignsByUser(user.id);
         } else if (isBrand) {
           response = await api.getBrandCampaigns(); // GET /api/campaigns
         }
@@ -48,7 +48,7 @@ export const Campaigns: React.FC = () => {
       await api.updateAllTikTokCampaignViews();
       // Re-fetch campaigns after updating views
       if (isCreator) {
-        const response = await api.getMyCampaigns();
+        const response = await api.getCampaignsByUser(user.id);
         setCampaigns(response.campaigns || []);
       } else if (isBrand) {
         const response = await api.getBrandCampaigns();
