@@ -23,25 +23,6 @@ export const Landing: React.FC = () => {
             The all-in-one platform connecting creators and brands for
             authentic, data-driven influencer marketing campaigns
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Button
-              asChild
-              size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-8 py-6 text-lg"
-            >
-              <Link to="/auth">
-                Get Started <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="bg-white/10 hover:bg-white/20 text-white border-white/30 px-8 py-6 text-lg backdrop-blur-sm"
-            >
-              <Link to="/auth">Learn More</Link>
-            </Button>
-          </div>
         </div>
 
         {/* Features Grid */}
