@@ -120,12 +120,10 @@ class ApiService {
 
   // Campaigns
   async getMyCampaigns() {
-    // For creators and brands, backend filters by user type
     return this.request("/campaigns");
   }
 
   async getBrandCampaigns() {
-    // Same endpoint, backend filters by user type
     return this.request("/campaigns");
   }
 
