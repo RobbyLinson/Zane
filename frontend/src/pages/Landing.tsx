@@ -24,14 +24,14 @@ export const Landing: React.FC = () => {
               size="default"
               className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm"
             >
-              <Link to="/auth">Login</Link>
+              <Link to="/auth/login">Login</Link>
             </Button>
             <Button
               asChild
               size="default"
               className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white"
             >
-              <Link to="/auth">
+              <Link to="/auth/register">
                 Sign Up <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -136,7 +136,7 @@ export const Landing: React.FC = () => {
               size="lg"
               className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
             >
-              <Link to="/auth">
+              <Link to="/auth/register">
                 Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>

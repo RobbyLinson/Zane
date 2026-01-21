@@ -1,11 +1,8 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 
-interface LoginFormProps {
-  onSwitchToRegister: () => void;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
+export const LoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -20,8 +17,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
     try {
       await login(email, password);
-    } catch (err: any) {
-      setError(err.message || "Login failed");
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Login failed");
+      }
     } finally {
       setLoading(false);
     }
@@ -80,12 +81,12 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onSwitchToRegister }) => {
 
       <p className="text-center text-sm text-[var(--text-300)] mt-4">
         Don't have an account?{" "}
-        <button
-          onClick={onSwitchToRegister}
+        <Link
+          to="/auth/register"
           className="text-[var(--secondary-200)] hover:text-blue-600 font-medium"
         >
           Sign up
-        </button>
+        </Link>
       </p>
     </div>
   );

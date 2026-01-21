@@ -2,14 +2,9 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // Add this import
 import { useAuth } from "../../contexts/AuthContext";
 import type { RegisterData } from "../../types";
+import { Link } from "react-router-dom";
 
-interface RegisterFormProps {
-  onSwitchToLogin: () => void;
-}
-
-export const RegisterForm: React.FC<RegisterFormProps> = ({
-  onSwitchToLogin,
-}) => {
+export const RegisterForm: React.FC = () => {
   const [formData, setFormData] = useState<RegisterData>({
     email: "",
     password: "",
@@ -47,7 +42,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
     if (!/[0-9]/.test(password)) {
       errors.push("Password must include a number.");
     }
-    if (!/[!@#$%^&*(),.?\":{}|<>]/.test(password)) {
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
       errors.push("Password must include a special character.");
     }
     if (password.toLowerCase().includes("password")) {
@@ -57,7 +52,7 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
   }, [formData, formData.password, formData.first_name, formData.last_name]);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -245,12 +240,12 @@ export const RegisterForm: React.FC<RegisterFormProps> = ({
 
       <p className="text-center text-sm text-[var(--text-300)] mt-4">
         Already have an account?{" "}
-        <button
-          onClick={onSwitchToLogin}
+        <Link
+          to="/auth/login"
           className="text-[var(--secondary-200)] hover:text-blue-600 font-medium"
         >
           Login
-        </button>
+        </Link>
       </p>
     </div>
   );
