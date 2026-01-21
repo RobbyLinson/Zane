@@ -6,16 +6,14 @@ import BarChartIcon from "@mui/icons-material/BarChart";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import SearchIcon from "@mui/icons-material/Search";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
 import type { Campaign } from "../types";
 
-interface DashboardProps {
-  onNavigate: (page: string) => void;
-}
-
-export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
+export const Dashboard: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   const [numContracts, setNumContracts] = React.useState<number>(0);
   const [numCampaigns, setNumCampaigns] = React.useState<number>(0);
@@ -77,7 +75,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             }
             return sum;
           },
-          0
+          0,
         );
         setBrandPayout(totalSpend);
         console.log(typeof brandPayout, brandPayout);
@@ -104,7 +102,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           style={{ color: "var(--primary-500)" }}
         />
       ),
-      action: () => onNavigate("contracts"),
+      action: () => navigate("/contracts"),
     },
     {
       title: "Active Campaigns",
@@ -116,14 +114,14 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           style={{ color: "var(--secondary-200)" }}
         />
       ),
-      action: () => onNavigate("campaigns"),
+      action: () => navigate("/campaigns"),
     },
     {
       title: "Total Earned",
       value: `€${currentPayout.toFixed(2)}`,
       color: "var(--text-50)",
       icon: <PaidIcon fontSize="medium" style={{ color: "var(--text-50)" }} />,
-      action: () => onNavigate("earnings"),
+      action: () => navigate("/earnings"),
     },
   ];
 
@@ -138,7 +136,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           style={{ color: "var(--primary-500)" }}
         />
       ),
-      action: () => onNavigate("contracts"),
+      action: () => navigate("/contracts"),
     },
     {
       title: "Total Campaigns",
@@ -150,7 +148,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
           style={{ color: "var(--secondary-200)" }}
         />
       ),
-      action: () => onNavigate("campaigns"),
+      action: () => navigate("/campaigns"),
     },
     {
       title: "Total Spend",
@@ -162,7 +160,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
       icon: (
         <CreditCardIcon fontSize="medium" style={{ color: "var(--text-50)" }} />
       ),
-      action: () => onNavigate("payouts"),
+      action: () => navigate("/payouts"),
     },
   ];
 
@@ -248,7 +246,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
             </div>
             <button
               onClick={() =>
-                onNavigate(
+                navigate(
                   user?.user_type === "creator" ? "contracts" : "campaigns"
                 )
               }
@@ -266,7 +264,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               {user?.user_type === "creator" ? (
                 <>
                   <button
-                    onClick={() => onNavigate("contracts")}
+                    onClick={() => navigate("/contracts")}
                     className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
@@ -287,7 +285,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                   </button>
                   <button
-                    onClick={() => onNavigate("campaigns")}
+                    onClick={() => navigate("/campaigns")}
                     className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
@@ -311,7 +309,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
               ) : (
                 <>
                   <button
-                    onClick={() => onNavigate("contracts")}
+                    onClick={() => navigate("/contracts")}
                     className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">
@@ -332,7 +330,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
                     </div>
                   </button>
                   <button
-                    onClick={() => onNavigate("campaigns")}
+                    onClick={() => navigate("/campaigns")}
                     className="w-full text-left p-3 bg-[var(--background-600)] hover:bg-[var(--background-700)] rounded-lg transition-colors"
                   >
                     <div className="flex items-center">

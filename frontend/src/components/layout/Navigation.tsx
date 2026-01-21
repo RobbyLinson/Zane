@@ -5,19 +5,20 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import PaidIcon from "@mui/icons-material/Paid";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../services/api";
 
-interface NavigationProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
+interface NavItem {
+  id: string;
+  name: string;
+  icon: React.ReactNode;
+  path: string;
 }
 
-export const Navigation: React.FC<NavigationProps> = ({
-  currentPage,
-  onNavigate,
-}) => {
+export const Navigation: React.FC = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
   const [stripeUrl, setStripeUrl] = useState<string | null>(null);
   const [loadingStripe, setLoadingStripe] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -78,6 +79,7 @@ export const Navigation: React.FC<NavigationProps> = ({
   const handleLogout = () => {
     logout();
     setIsDropdownOpen(false);
+    navigate("/auth");
   };
 
   const handleVerifyTikTok = async () => {
@@ -103,21 +105,25 @@ export const Navigation: React.FC<NavigationProps> = ({
             id: "dashboard",
             name: "Dashboard",
             icon: <DashboardIcon fontSize="small" />,
+            path: "/dashboard",
           },
           {
             id: "contracts",
             name: "Browse Contracts",
             icon: <AssignmentIcon fontSize="small" />,
+            path: "/contracts",
           },
           {
             id: "campaigns",
             name: "My Campaigns",
             icon: <CampaignIcon fontSize="small" />,
+            path: "/campaigns",
           },
           {
             id: "earnings",
             name: "Earnings",
             icon: <PaidIcon fontSize="small" />,
+            path: "/earnings",
           },
         ]
       : [
@@ -125,21 +131,25 @@ export const Navigation: React.FC<NavigationProps> = ({
             id: "dashboard",
             name: "Dashboard",
             icon: <DashboardIcon fontSize="small" />,
+            path: "/dashboard",
           },
           {
             id: "contracts",
             name: "My Contracts",
             icon: <AssignmentIcon fontSize="small" />,
+            path: "/contracts",
           },
           {
             id: "campaigns",
             name: "Analytics",
             icon: <BarChartIcon fontSize="small" />,
+            path: "/campaigns",
           },
           {
             id: "payouts",
             name: "Payouts",
             icon: <CreditCardIcon fontSize="small" />,
+            path: "/payouts",
           },
         ];
 
@@ -155,18 +165,20 @@ export const Navigation: React.FC<NavigationProps> = ({
             </div>
             <div className="hidden md:ml-6 md:flex md:space-x-8">
               {navItems.map((item) => (
-                <button
+                <NavLink
                   key={item.id}
-                  onClick={() => onNavigate(item.id)}
-                  className={`inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors duration-150 ${
-                    currentPage === item.id
-                      ? "border-b-2 border-[var(--secondary-200)] text-[var(--text-100)]"
-                      : "text-[var(--text-300)] hover:text-[var(--secondary-200)] hover:border-[var(--border-700)] border-b-2 border-transparent"
-                  }`}
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `inline-flex items-center px-1 pt-1 text-sm font-medium transition-colors duration-150 ${
+                      isActive
+                        ? "border-b-2 border-[var(--secondary-200)] text-[var(--text-100)]"
+                        : "text-[var(--text-300)] hover:text-[var(--secondary-200)] hover:border-[var(--border-700)] border-b-2 border-transparent"
+                    }`
+                  }
                 >
                   <span className="mr-2">{item.icon}</span>
                   {item.name}
-                </button>
+                </NavLink>
               ))}
             </div>
           </div>
@@ -268,18 +280,20 @@ export const Navigation: React.FC<NavigationProps> = ({
           style={{ paddingTop: 0, paddingBottom: 0 }}
         >
           {navItems.map((item) => (
-            <button
+            <NavLink
               key={item.id}
-              onClick={() => onNavigate(item.id)}
-              className={`whitespace-nowrap flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
-                currentPage === item.id
-                  ? "bg-[var(--primary-500)] text-white"
-                  : "text-[var(--text-300)] hover:text-[var(--secondary-200)] hover:bg-[var(--background-600)]"
-              }`}
+              to={item.path}
+              className={({ isActive }) =>
+                `whitespace-nowrap flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors duration-150 ${
+                  isActive
+                    ? "bg-[var(--primary-500)] text-white"
+                    : "text-[var(--text-300)] hover:text-[var(--secondary-200)] hover:bg-[var(--background-600)]"
+                }`
+              }
             >
               <span className="mr-2">{item.icon}</span>
               {item.name}
-            </button>
+            </NavLink>
           ))}
         </div>
       </div>
