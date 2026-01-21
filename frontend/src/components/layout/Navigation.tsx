@@ -9,13 +9,6 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../services/api";
 
-interface NavItem {
-  id: string;
-  name: string;
-  icon: React.ReactNode;
-  path: string;
-}
-
 export const Navigation: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();

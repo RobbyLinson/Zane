@@ -32,7 +32,7 @@ const handleTikTokCallback = async (req, res) => {
     if (!code) {
       console.error("No code received in callback");
       return res.redirect(
-        `${process.env.FRONTEND_URL}/dashboard?tiktok_error=access_denied`
+        `${process.env.FRONTEND_URL}/dashboard?tiktok_error=access_denied`,
       );
     }
 
@@ -44,26 +44,28 @@ const handleTikTokCallback = async (req, res) => {
       const tokenData = await tiktokService.getAccessToken(
         code,
         redirectUri,
-        userId
+        userId,
       );
       await tiktokService.storeAccessToken(userId, tokenData);
 
       console.log("TikTok authentication successful");
-      res.redirect(`${process.env.FRONTEND_URL}/?tiktok_connected=true`);
+      res.redirect(
+        `${process.env.FRONTEND_URL}/dashboard?tiktok_connected=true`,
+      );
     } catch (error) {
       console.error("Failed to exchange token:", error);
       res.redirect(
-        `${process.env.FRONTEND_URL}/?tiktok_error=${encodeURIComponent(
-          error.message
-        )}`
+        `${process.env.FRONTEND_URL}/dashboard?tiktok_error=${encodeURIComponent(
+          error.message,
+        )}`,
       );
     }
   } catch (error) {
     console.error("TikTok callback error:", error);
     res.redirect(
-      `${process.env.FRONTEND_URL}/?tiktok_error=${encodeURIComponent(
-        error.message
-      )}`
+      `${process.env.FRONTEND_URL}/dashboard?tiktok_error=${encodeURIComponent(
+        error.message,
+      )}`,
     );
   }
 };
@@ -84,7 +86,7 @@ const submitCampaignContent = async (req, res) => {
       campaignId,
       tiktokUrl,
       userId,
-      accessToken
+      accessToken,
     );
 
     res.json(result);
@@ -106,7 +108,7 @@ const updateCampaignViews = async (req, res) => {
     // Update campaign views
     const result = await tiktokService.updateCampaignViews(
       campaignId,
-      accessToken
+      accessToken,
     );
 
     res.json(result);
@@ -129,7 +131,7 @@ const updateAllCampaignViews = async (req, res) => {
     // Update all campaigns
     const result = await tiktokService.updateAllUserCampaigns(
       userId,
-      accessToken
+      accessToken,
     );
 
     res.json(result);
@@ -154,7 +156,7 @@ const getCampaignAnalytics = async (req, res) => {
 
     const result = await tiktokService.getCampaignAnalytics(
       campaignId,
-      accessToken
+      accessToken,
     );
 
     res.json(result);
@@ -192,7 +194,7 @@ const disconnectTikTok = async (req, res) => {
         tiktok_refresh_token: null,
         tiktok_expires_at: null,
       },
-      { where: { id: userId } }
+      { where: { id: userId } },
     );
 
     res.json({
@@ -244,7 +246,7 @@ const getCampaignsWithTikTokStats = async (req, res) => {
             } catch (error) {
               console.log(
                 `Failed to update campaign ${campaign.id}:`,
-                error.message
+                error.message,
               );
             }
           }
