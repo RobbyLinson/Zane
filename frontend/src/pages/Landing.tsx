@@ -8,7 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { ArrowRight, Users, TrendingUp, Shield, Zap } from "lucide-react";
+import {
+  ArrowRight,
+  Users,
+  TrendingUp,
+  Shield,
+  Zap,
+  Target,
+} from "lucide-react";
 
 export const Landing: React.FC = () => {
   return (
@@ -42,38 +49,24 @@ export const Landing: React.FC = () => {
       <div className="container mx-auto px-4 py-10">
         <div className="text-center text-white mb-16">
           <h1 className="text-5xl md:text-7xl font-bold mb-6 animate-fade-in">
-            Welcome to Zane
+            Real Views. Fair Pay.
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            The all-in-one platform connecting creators and brands for
-            authentic, data-driven influencer marketing campaigns
+            The CPM network that replaces flat-fee guesswork with fraud-proof
+            views for brands, and creators earn more, faster.
           </p>
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
-            <CardHeader>
-              <div className="w-12 h-12 border-3 bg-[var(--accent-500)] rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle>Creator Network</CardTitle>
-              <CardDescription className="text-white/70">
-                Connect with thousands of verified influencers across all major
-                platforms
-              </CardDescription>
-            </CardHeader>
-          </Card>
-
+        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6 mt-20">
           <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
             <CardHeader>
               <div className="w-12 h-12 bg-[var(--primary-500)] rounded-lg flex items-center justify-center mb-4">
-                <TrendingUp className="h-6 w-6 text-white" />
+                <Users className="h-6 w-6 text-white" />
               </div>
-              <CardTitle>Real-Time Analytics</CardTitle>
+              <CardTitle>Quality, Vetted Network</CardTitle>
               <CardDescription className="text-white/70">
-                Track campaign performance with live metrics and detailed
-                insights
+                Access a curated community of creators focused on performance.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -83,9 +76,10 @@ export const Landing: React.FC = () => {
               <div className="w-12 h-12 bg-[var(--secondary-200)] rounded-lg flex items-center justify-center mb-4">
                 <Shield className="h-6 w-6 text-white" />
               </div>
-              <CardTitle>Secure Payments</CardTitle>
+              <CardTitle>Fraud-Protected Views</CardTitle>
               <CardDescription className="text-white/70">
-                Automated payouts and transparent earnings tracking for creators
+                Our multi-lawyer verification ensures you only pay for genuine,
+                human views.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -93,11 +87,12 @@ export const Landing: React.FC = () => {
           <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
             <CardHeader>
               <div className="w-12 h-12 bg-[var(--text-500)] rounded-lg flex items-center justify-center mb-4">
-                <Zap className="h-6 w-6 text-white" />
+                <Target className="h-6 w-6 text-white" />
               </div>
-              <CardTitle>Smart Matching</CardTitle>
+              <CardTitle>Guaranteed CPM Pricing</CardTitle>
               <CardDescription className="text-white/70">
-                AI-powered creator recommendations for your brand campaigns
+                Set your exact cost per 1,000 views. No surprises, no-flat fee
+                guesswork.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -106,16 +101,16 @@ export const Landing: React.FC = () => {
         {/* Stats Section */}
         <div className="grid md:grid-cols-3 gap-8 mt-10 text-center text-white">
           <div className="p-8">
-            <div className="text-5xl font-bold mb-2">10K+</div>
-            <div className="text-xl text-white/80">Active Creators</div>
+            <div className="text-5xl font-bold mb-2">&lt;48 hrs</div>
+            <div className="text-xl text-white/80">Time to First Payout</div>
           </div>
           <div className="p-8">
-            <div className="text-5xl font-bold mb-2">500+</div>
-            <div className="text-xl text-white/80">Brand Partners</div>
+            <div className="text-5xl font-bold mb-2">&gt;99%</div>
+            <div className="text-xl text-white/80">Views Verified as Human</div>
           </div>
           <div className="p-8">
-            <div className="text-5xl font-bold mb-2">€2M+</div>
-            <div className="text-xl text-white/80">Creator Earnings</div>
+            <div className="text-5xl font-bold mb-2">€5.50+</div>
+            <div className="text-xl text-white/80">Average CPM on Zane</div>
           </div>
         </div>
 
@@ -130,14 +125,23 @@ export const Landing: React.FC = () => {
               partnerships on Zane
             </CardDescription>
           </CardHeader>
-          <CardContent className="flex justify-center pb-8">
+          <CardContent className="grid-cols-2 flex justify-center pb-8">
             <Button
               asChild
               size="lg"
               className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
             >
               <Link to="/auth/register">
-                Start Your Journey <ArrowRight className="ml-2 h-5 w-5" />
+                Join the Network <ArrowRight className="ml-2 h-5 w-5" />
+              </Link>
+            </Button>
+            <Button
+              asChild
+              size="lg"
+              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
+            >
+              <Link to="/auth/register">
+                Start a Campaign <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
           </CardContent>
