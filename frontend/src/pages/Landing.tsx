@@ -15,6 +15,8 @@ import {
   Shield,
   Zap,
   Target,
+  Cog,
+  Lightbulb,
 } from "lucide-react";
 
 export const Landing: React.FC = () => {
@@ -58,43 +60,97 @@ export const Landing: React.FC = () => {
         </div>
 
         {/* Features Grid */}
-        <div className="grid md:grid-cols-1 lg:grid-cols-3 gap-6 mt-20">
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
-            <CardHeader>
-              <div className="w-12 h-12 bg-[var(--primary-500)] rounded-lg flex items-center justify-center mb-4">
-                <Users className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle>Quality, Vetted Network</CardTitle>
-              <CardDescription className="text-white/70">
-                Access a curated community of creators focused on performance.
-              </CardDescription>
-            </CardHeader>
+        <div className="mt-10 grid md:grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Brands Column */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardTitle className="text-3xl md:text-4xl text-white mb-6 font-semibold py-4 px-4">
+              Why Promote on Zane?
+            </CardTitle>
+            <div className="grid grid-cols-1 gap-6 mb-5 px-4">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--primary-500)] rounded-lg flex items-center justify-center mb-4">
+                    <Users className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Quality, Vetted Network</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Access a curated community of creators focused on
+                    performance.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--secondary-200)] rounded-lg flex items-center justify-center mb-4">
+                    <Shield className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Fraud-Protected Views</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Our multi-lawyer verification ensures you only pay for
+                    genuine, human views.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--text-500)] rounded-lg flex items-center justify-center mb-4">
+                    <Target className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Guaranteed CPM Pricing</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Set your exact cost per 1,000 views. No surprises, no-flat
+                    fee guesswork.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
           </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
-            <CardHeader>
-              <div className="w-12 h-12 bg-[var(--secondary-200)] rounded-lg flex items-center justify-center mb-4">
-                <Shield className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle>Fraud-Protected Views</CardTitle>
-              <CardDescription className="text-white/70">
-                Our multi-lawyer verification ensures you only pay for genuine,
-                human views.
-              </CardDescription>
-            </CardHeader>
-          </Card>
+          {/* Creators Column */}
+          <Card className="bg-white/10 backdrop-blur-md border-white/20">
+            <CardTitle className="text-3xl md:text-4xl text-white mb-6 font-semibold py-4 px-4">
+              Why Create for Zane?
+            </CardTitle>
+            <div className="grid grid-cols-1 gap-6 mb-5 px-4">
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--primary-500)] rounded-lg flex items-center justify-center mb-4">
+                    <TrendingUp className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Earn More, Faster</CardTitle>
+                  <CardDescription className="text-white/70">
+                    Your income scales directly with your content’s real reach.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
 
-          <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
-            <CardHeader>
-              <div className="w-12 h-12 bg-[var(--text-500)] rounded-lg flex items-center justify-center mb-4">
-                <Target className="h-6 w-6 text-white" />
-              </div>
-              <CardTitle>Guaranteed CPM Pricing</CardTitle>
-              <CardDescription className="text-white/70">
-                Set your exact cost per 1,000 views. No surprises, no-flat fee
-                guesswork.
-              </CardDescription>
-            </CardHeader>
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--secondary-200)] rounded-lg flex items-center justify-center mb-4">
+                    <Cog className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Automated and Transparent</CardTitle>
+                  <CardDescription className="text-white/70">
+                    See earnings update in real-time and get paid instantly.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all">
+                <CardHeader>
+                  <div className="w-12 h-12 bg-[var(--text-500)] rounded-lg flex items-center justify-center mb-4">
+                    <Lightbulb className="h-6 w-6 text-white" />
+                  </div>
+                  <CardTitle>Focus on Creativity</CardTitle>
+                  <CardDescription className="text-white/70">
+                    No negotiations. Just create great content and get paid
+                    fairly for its reach.
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            </div>
           </Card>
         </div>
 
