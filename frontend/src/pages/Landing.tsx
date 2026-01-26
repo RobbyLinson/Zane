@@ -13,7 +13,6 @@ import {
   Users,
   TrendingUp,
   Shield,
-  Zap,
   Target,
   Cog,
   Lightbulb,
