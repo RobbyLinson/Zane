@@ -184,7 +184,7 @@ export const Landing: React.FC = () => {
             <Button
               asChild
               size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg gap-4"
+              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mx-12"
             >
               <Link to="/auth/register/creator">
                 Join the Network <ArrowRight className="ml-2 h-5 w-5" />
@@ -193,7 +193,7 @@ export const Landing: React.FC = () => {
             <Button
               asChild
               size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg gap-4"
+              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mx-12"
             >
               <Link to="/auth/register/brand">
                 Start a Campaign <ArrowRight className="ml-2 h-5 w-5" />
@@ -202,7 +202,7 @@ export const Landing: React.FC = () => {
             {/* <Button
               asChild
               size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
+              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all"
             >
               <a href="mailto:filler@zane.com">
                 Book a Demo <ArrowRight className="ml-2 h-5 w-5" />
