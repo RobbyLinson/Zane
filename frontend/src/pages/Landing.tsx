@@ -169,45 +169,37 @@ export const Landing: React.FC = () => {
           </div>
         </div>
 
-        {/* CTA Section */}
-        <Card className="mt-20 bg-white/10 backdrop-blur-md border-white/20">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl md:text-4xl text-white mb-4">
-              Ready to Transform Your Influence?
-            </CardTitle>
-            <CardDescription className="text-xl text-white/80 mb-6">
-              Join thousands of creators and brands building authentic
-              partnerships on Zane
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="grid-cols-3 flex justify-center pb-8">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mx-12"
-            >
-              <Link to="/auth/register/creator">
-                Join the Network <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mx-12"
-            >
-              <Link to="/auth/register/brand">
-                Start a Campaign <ArrowRight className="ml-2 h-5 w-5" />
-              </Link>
-            </Button>
-            {/* <Button
-              asChild
-              size="lg"
-              className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all"
-            >
-              <a href="mailto:filler@zane.com">
-                Book a Demo <ArrowRight className="ml-2 h-5 w-5" />
-              </a>
-            </Button> */}
+        <Card className="mt-10 bg-white/10 backdrop-blur-md border-white/20">
+          <CardContent className="grid grid-cols-1 gap-6 pb-8 md:grid-cols-2 mt-10">
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Brands: Get guaranteed, fraud proof-views.
+              </h3>
+              <Button
+                asChild
+                size="lg"
+                className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mt-5"
+              >
+                <Link to="/auth/register/brand">
+                  Start a Campaign or Get a Demo
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
+            <div className="text-center">
+              <h3 className="text-xl font-semibold text-white mb-3">
+                Creators: Get paid for every 1,000 real views. Automatically.
+              </h3>
+              <Button
+                asChild
+                size="lg"
+                className="bg-white/10 backdrop-blur-md border-white/20 text-white hover:bg-white/15 transition-all mt-5"
+              >
+                <Link to="/auth/register/creator">
+                  Join the Network <ArrowRight className="ml-2 h-5 w-5" />
+                </Link>
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
