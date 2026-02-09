@@ -2,9 +2,11 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion"; // Add this import
 import { useAuth } from "../../contexts/AuthContext";
 import type { RegisterData } from "../../types";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 export const RegisterForm: React.FC = () => {
+  const { userType } = useParams();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState<RegisterData>({
     email: "",
     password: "",
@@ -19,6 +21,12 @@ export const RegisterForm: React.FC = () => {
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
   const { register } = useAuth();
+
+  useEffect(() => {
+    if (userType === "creator" || userType === "brand") {
+      setFormData((prev) => ({ ...prev, user_type: userType }));
+    }
+  }, [userType]);
 
   useEffect(() => {
     const errors: string[] = [];
@@ -56,6 +64,11 @@ export const RegisterForm: React.FC = () => {
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleUserTypeChange = (nextType: "creator" | "brand") => {
+    setFormData((prev) => ({ ...prev, user_type: nextType }));
+    navigate(`/auth/register/${nextType}`, { replace: true });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -104,18 +117,35 @@ export const RegisterForm: React.FC = () => {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[var(--text-200)] mb-1">
+          <label className="block text-sm font-medium text-[var(--text-200)] mb-2">
             I am a...
           </label>
-          <select
-            name="user_type"
-            value={formData.user_type}
-            onChange={handleChange}
-            className="w-full px-3 py-2 border border-[var(--border-900)] rounded-md focus:outline-none focus:ring-2 focus:ring-[var(--secondary-200)] text-[var(--text-100)] bg-[var(--background-800)]"
-          >
-            <option value="creator">Creator</option>
-            <option value="brand">Brand</option>
-          </select>
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleUserTypeChange("creator")}
+              className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                formData.user_type === "creator"
+                  ? "bg-[var(--primary-500)] text-white border-[var(--primary-500)]"
+                  : "bg-[var(--background-800)] text-[var(--text-100)] border-[var(--border-900)] hover:border-[var(--secondary-200)]"
+              }`}
+              aria-pressed={formData.user_type === "creator"}
+            >
+              Creator
+            </button>
+            <button
+              type="button"
+              onClick={() => handleUserTypeChange("brand")}
+              className={`px-3 py-2 rounded-md border text-sm font-medium transition-colors ${
+                formData.user_type === "brand"
+                  ? "bg-[var(--primary-500)] text-white border-[var(--primary-500)]"
+                  : "bg-[var(--background-800)] text-[var(--text-100)] border-[var(--border-900)] hover:border-[var(--secondary-200)]"
+              }`}
+              aria-pressed={formData.user_type === "brand"}
+            >
+              Brand
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">

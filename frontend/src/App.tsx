@@ -62,7 +62,11 @@ function App() {
         element={user ? <Navigate to="/dashboard" replace /> : <AuthLayout />}
       >
         <Route path="/auth/login" element={<LoginForm />} />
-        <Route path="/auth/register" element={<RegisterForm />} />
+        <Route
+          path="/auth/register"
+          element={<Navigate to="/auth/register/creator" replace />}
+        />
+        <Route path="/auth/register/:userType" element={<RegisterForm />} />
       </Route>
 
       <Route element={<RequireAuth />}>

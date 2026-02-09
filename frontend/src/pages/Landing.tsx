@@ -39,7 +39,7 @@ export const Landing: React.FC = () => {
               size="default"
               className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white"
             >
-              <Link to="/auth/register">
+              <Link to="/auth/register/creator">
                 Sign Up <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
@@ -180,25 +180,34 @@ export const Landing: React.FC = () => {
               partnerships on Zane
             </CardDescription>
           </CardHeader>
-          <CardContent className="grid-cols-2 flex justify-center pb-8">
+          <CardContent className="grid-cols-3 flex justify-center pb-8">
             <Button
               asChild
               size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
+              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg gap-4"
             >
-              <Link to="/auth/register">
+              <Link to="/auth/register/creator">
                 Join the Network <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button
               asChild
               size="lg"
-              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
+              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg gap-4"
             >
-              <Link to="/auth/register">
+              <Link to="/auth/register/brand">
                 Start a Campaign <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
+            {/* <Button
+              asChild
+              size="lg"
+              className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white px-12 py-6 text-lg"
+            >
+              <a href="mailto:filler@zane.com">
+                Book a Demo <ArrowRight className="ml-2 h-5 w-5" />
+              </a>
+            </Button> */}
           </CardContent>
         </Card>
       </div>
