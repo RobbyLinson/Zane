@@ -24,6 +24,8 @@ const testConnection = async () => {
   try {
     await sequelize.authenticate();
     console.log("✅ Database connected successfully!");
+    await sequelize.query("CREATE EXTENSION IF NOT EXISTS vector;");
+    console.log("✅ pgvector extension enabled!");
     return true;
   } catch (error) {
     console.error("❌ Unable to connect to database:", error.message);
@@ -34,7 +36,7 @@ const testConnection = async () => {
     // Sequelize wraps the driver error in `.original` or `.parent`
     console.error(
       "Driver/original error:",
-      error.original || error.parent || null
+      error.original || error.parent || null,
     );
 
     // Stack trace
@@ -64,7 +66,7 @@ const testConnection = async () => {
       // Show a safely masked raw value as fallback
       console.error(
         "Raw DATABASE_URL (masked):",
-        raw ? raw.replace(/:(\/\/[^:]+:)([^@]+)@/, "$1****@") : raw
+        raw ? raw.replace(/:(\/\/[^:]+:)([^@]+)@/, "$1****@") : raw,
       );
     }
 
