@@ -63,6 +63,7 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showMainModal, setShowMainModal] = useState(true);
   const [showFundModal, setShowFundModal] = useState(false);
 
   const handleChange = (
@@ -94,8 +95,23 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     }
     setError("");
     setLoading(true);
+    setShowMainModal(false);
     setShowFundModal(true);
     setLoading(false);
+  };
+
+  const handleMainModalOpenChange = (open: boolean) => {
+    if (!open) {
+      setShowMainModal(false);
+      onCancel();
+    }
+  };
+
+  const handleFundModalOpenChange = (open: boolean) => {
+    if (!open) {
+      setShowFundModal(false);
+      onCancel();
+    }
   };
 
   const handleFundSuccess = async () => {
@@ -128,7 +144,7 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
   return (
     <>
       {/* Main contract form dialog */}
-      <Dialog open onOpenChange={(open: boolean) => !open && onCancel()}>
+      <Dialog open={showMainModal} onOpenChange={handleMainModalOpenChange}>
         <DialogContent className="max-w-4xl p-0 bg-[var(--background-700)] text-[var(--text-100)] border border-[var(--border-900)]">
           <DialogHeader>
             <div className="flex justify-between items-start">
@@ -146,7 +162,10 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
                 </DialogDescription>
               </div>
               <DialogClose
-                onClick={onCancel}
+                onClick={() => {
+                  setShowMainModal(false);
+                  onCancel();
+                }}
                 className="text-[var(--text-300)] hover:text-[var(--text-100)] transition-colors text-2xl font-light leading-none mt-1 ml-4"
               >
                 ×
@@ -352,7 +371,10 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
                 <Button
                   type="button"
                   variant="ghost"
-                  onClick={onCancel}
+                  onClick={() => {
+                    setShowMainModal(false);
+                    onCancel();
+                  }}
                   className="text-[var(--text-300)] hover:text-[var(--text-100)]"
                 >
                   Cancel
@@ -379,26 +401,44 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
 
       {/* Payment dialog — shown after form submit */}
       {showFundModal && (
-        <Dialog
-          open={showFundModal}
-          onOpenChange={(open: boolean) => !open && setShowFundModal(false)}
-        >
+        <Dialog open={showFundModal} onOpenChange={handleFundModalOpenChange}>
           <DialogContent className="max-w-2xl bg-[var(--background-700)] text-[var(--text-100)] border border-[var(--border-900)]">
             <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <PaidIcon fontSize="medium" style={{ color: "var(--primary-500)" }} />
-                Fund Campaign
-              </DialogTitle>
-              <DialogDescription>
-                Enter your payment details to fund €{formData.company_charge.toLocaleString()} for this campaign.
-              </DialogDescription>
+              <div className="flex justify-between items-start">
+                <div>
+                  <DialogTitle className="flex items-center gap-2">
+                    <PaidIcon
+                      fontSize="medium"
+                      style={{ color: "var(--primary-500)" }}
+                    />
+                    Fund Campaign
+                  </DialogTitle>
+                  <DialogDescription>
+                    Enter your payment details to fund €
+                    {formData.company_charge.toLocaleString()} for this
+                    campaign.
+                  </DialogDescription>
+                </div>
+                <DialogClose
+                  onClick={() => {
+                    setShowFundModal(false);
+                    onCancel();
+                  }}
+                  className="text-[var(--text-300)] hover:text-[var(--text-100)] transition-colors text-2xl font-light leading-none mt-1 ml-4"
+                >
+                  ×
+                </DialogClose>
+              </div>
             </DialogHeader>
             <div className="p-6">
               <Elements stripe={stripePromise}>
                 <FundContractForm
                   contractDraft={formData}
                   onSuccess={handleFundSuccess}
-                  onCancel={() => setShowFundModal(false)}
+                  onCancel={() => {
+                    setShowFundModal(false);
+                    onCancel();
+                  }}
                 />
               </Elements>
             </div>

@@ -29,7 +29,8 @@ export function FundContractForm({
       const res = await api.fundDraft(contractDraft);
 
       const { paymentIntent } = res;
-      if (!paymentIntent) throw new Error(res.error || "Failed to create payment intent");
+      if (!paymentIntent)
+        throw new Error(res.error || "Failed to create payment intent");
 
       // Confirm payment with card details
       const cardElement = elements.getElement(CardElement);
@@ -56,26 +57,26 @@ export function FundContractForm({
   return (
     <form
       onSubmit={handleFund}
-      className="space-y-4 p-4 bg-white rounded-lg shadow"
+      className="space-y-4 p-4 bg-[var(--background-600)] rounded-lg border border-[var(--border-900)]"
     >
-      <CardElement className="p-3 border rounded" />
+      <CardElement className="p-3 border border-[var(--border-900)] rounded bg-[var(--background-700)]" />
       <div className="flex space-x-2">
         <button
           type="submit"
           disabled={!stripe || loading}
-          className="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50"
+          className="w-full py-2 bg-[var(--primary-500)] text-white rounded-lg hover:bg-[var(--primary-700)] disabled:opacity-50"
         >
           {loading ? "Processing..." : "Fund Contract"}
         </button>
         <button
           type="button"
           onClick={onCancel}
-          className="w-full py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+          className="w-full py-2 bg-[var(--background-700)] text-[var(--text-200)] border border-[var(--border-900)] rounded-lg hover:bg-[var(--background-800)]"
         >
           Cancel
         </button>
       </div>
-      {message && <p className="text-sm text-gray-700">{message}</p>}
+      {message && <p className="text-sm text-[var(--text-200)]">{message}</p>}
     </form>
   );
 }
