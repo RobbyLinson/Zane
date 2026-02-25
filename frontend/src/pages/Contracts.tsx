@@ -221,11 +221,6 @@ export const Contracts: React.FC = () => {
                       <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 bg-[var(--secondary-200)] text-[var(--background-700)] text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
                         <AutoAwesomeIcon style={{ fontSize: 10 }} />
                         Zane Pick
-                        {contract.similarity_score !== undefined && (
-                          <span className="opacity-70 ml-0.5">
-                            {Math.round(contract.similarity_score * 100)}%
-                          </span>
-                        )}
                       </div>
                       <div className="rounded-xl border-2 border-[var(--secondary-200)] overflow-hidden">
                         <ContractCard
