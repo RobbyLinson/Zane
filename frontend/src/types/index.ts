@@ -4,6 +4,7 @@ export interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: RegisterData) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
 }
 
 export interface RegisterData {
@@ -24,23 +25,24 @@ export interface User {
   company_name?: string;
   email_verified: boolean;
   is_active: boolean;
+  about_me?: string;
 }
 
 export interface Contract {
   id: string;
   brand_id: string;
   title: string;
-  description?: string;
+  description: string;
+  target_audience?: string;
   cpm_rate: number;
   max_payout: number;
   min_views: number;
-  target_audience?: string;
-  content_requirements?: string;
   platform: "tiktok" | "instagram" | "youtube_shorts";
   status: "active" | "paused" | "completed" | "cancelled";
   expires_at?: string;
   createdAt: string;
   updatedAt: string;
+  similarity_score?: number;
   brand?: {
     id: string;
     company_name?: string;
@@ -70,12 +72,10 @@ export interface Campaign {
 
 export interface CreateContractData {
   title: string;
-  description?: string;
+  description: string;
   cpm_rate: number;
   max_payout: number;
   min_views?: number;
-  target_audience?: string;
-  content_requirements?: string;
   platform?: "tiktok" | "instagram" | "youtube_shorts";
   expires_at?: string;
   company_charge: number;

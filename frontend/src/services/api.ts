@@ -66,7 +66,7 @@ class ApiService {
     const searchParams = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        if (value !== undefined) {
+        if (value !== undefined && value !== "") {
           searchParams.append(key, value.toString());
         }
       });
@@ -82,6 +82,11 @@ class ApiService {
   /** Returns { count } — number of active contracts still open to creators */
   async getAvailableContractCount() {
     return this.request("/contracts/available/count");
+  }
+
+  /** Returns { contracts } with similarity_score — creator only, requires about_me set */
+  async getRecommendedContracts() {
+    return this.request("/contracts/recommended");
   }
 
   async createContract(contractData: CreateContractData) {
@@ -143,6 +148,13 @@ class ApiService {
     return this.request("/user/withdraw", {
       method: "POST",
       body: JSON.stringify({ amount }),
+    });
+  }
+
+  async updateProfile(data: { about_me?: string; company_name?: string }) {
+    return this.request("/user/profile", {
+      method: "PUT",
+      body: JSON.stringify(data),
     });
   }
 

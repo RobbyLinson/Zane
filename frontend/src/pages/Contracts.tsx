@@ -1,14 +1,19 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
 import { ContractCard } from "../components/contracts/ContractCard";
 import { CreateContractForm } from "../components/contracts/CreateContractForm";
 import type { Contract } from "../types";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 
 export const Contracts: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [recommended, setRecommended] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [filters, setFilters] = useState({ platform: "", status: "" });
@@ -16,39 +21,73 @@ export const Contracts: React.FC = () => {
   const isCreator = user?.user_type === "creator";
   const isBrand = user?.user_type === "brand";
 
+  const recommendedIds = new Set(recommended.map((contract) => contract.id));
+  const normalContracts = isCreator
+    ? contracts.filter((contract) => !recommendedIds.has(contract.id))
+    : contracts;
+  const visibleContracts = isCreator
+    ? [...recommended, ...normalContracts]
+    : normalContracts;
+
+  const debugLog = (...args: unknown[]) => {
+    console.log("[Contracts]", ...args);
+  };
+
   const loadContracts = async () => {
     try {
       setLoading(true);
-      const response = await api.getContracts(filters);
-      setContracts(response.contracts);
+      debugLog("loadContracts:start", {
+        userId: user?.id,
+        userType: user?.user_type,
+        hasAboutMe: Boolean(user?.about_me),
+        filters,
+      });
+
+      const [contractsRes, recommendedRes] = await Promise.all([
+        api.getContracts(filters),
+        isCreator && user?.about_me
+          ? api.getRecommendedContracts()
+          : Promise.resolve({ contracts: [] }),
+      ]);
+
+      debugLog("loadContracts:response", {
+        contractsCount: contractsRes?.contracts?.length ?? 0,
+        recommendedCount: recommendedRes?.contracts?.length ?? 0,
+        contractsPreview: contractsRes?.contracts?.slice?.(0, 2),
+      });
+
+      setContracts(contractsRes.contracts);
+      setRecommended(recommendedRes.contracts);
     } catch (err) {
       console.error("Failed to load contracts:", err);
+      debugLog("loadContracts:error", err);
     } finally {
       setLoading(false);
+      debugLog("loadContracts:done");
     }
   };
 
   useEffect(() => {
-    const fetchContracts = async () => {
-      try {
-        setLoading(true);
-        const response = await api.getContracts(filters);
-        setContracts(response.contracts);
-      } catch (err: unknown) {
-        console.error("Failed to load contracts:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContracts();
+    debugLog("filters changed", filters);
+    loadContracts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters]);
+
+  useEffect(() => {
+    debugLog("state snapshot", {
+      loading,
+      contractsCount: contracts.length,
+      recommendedCount: recommended.length,
+      isCreator,
+      isBrand,
+    });
+  }, [loading, contracts.length, recommended.length, isCreator, isBrand]);
 
   const handleAcceptContract = async (contractId: string) => {
     try {
       await api.acceptContract(contractId);
-      // Remove from list for creators
       setContracts((prev) => prev.filter((c) => c.id !== contractId));
+      setRecommended((prev) => prev.filter((c) => c.id !== contractId));
     } catch (err) {
       console.error("Failed to accept contract:", err);
     }
@@ -78,6 +117,7 @@ export const Contracts: React.FC = () => {
 
             {isBrand && (
               <button
+                type="button"
                 onClick={() => setShowCreateForm(true)}
                 className="bg-[var(--primary-500)] text-white px-4 py-2 rounded-md hover:bg-[var(--primary-700)] flex items-center gap-2"
               >
@@ -86,6 +126,8 @@ export const Contracts: React.FC = () => {
               </button>
             )}
           </div>
+
+          {/* ── Zane Recommendations (creators only) ─────────────────────────── */}
 
           {/* Filters */}
           <div className="bg-[var(--background-700)] p-4 rounded-lg shadow mb-6">
@@ -135,27 +177,81 @@ export const Contracts: React.FC = () => {
             </div>
           </div>
 
+          {isCreator && !user?.about_me && (
+            <div
+              onClick={() => navigate("/profile")}
+              className="flex items-center gap-3 bg-[var(--background-700)] border border-[var(--secondary-200)]/40 hover:border-[var(--secondary-200)] rounded-lg px-5 py-4 mb-6 cursor-pointer transition group"
+            >
+              <InfoOutlinedIcon
+                fontSize="small"
+                style={{ color: "var(--secondary-200)" }}
+                className="shrink-0"
+              />
+              <p className="text-sm text-[var(--text-200)] group-hover:text-[var(--text-100)] transition">
+                <span className="font-semibold text-[var(--secondary-200)]">
+                  Set up your profile
+                </span>{" "}
+                to unlock Zane Recommendations — contracts matched to your
+                content style.
+              </p>
+              <span className="ml-auto text-xs text-[var(--secondary-200)] font-medium whitespace-nowrap">
+                Go to Profile →
+              </span>
+            </div>
+          )}
+
           {/* Contracts list */}
           {loading ? (
             <div className="text-center text-[var(--text-300)]">
               Loading contracts...
             </div>
-          ) : contracts.length === 0 ? (
+          ) : visibleContracts.length === 0 ? (
             <div className="text-center text-[var(--text-300)]">
               No contracts found. {isBrand && "Create one to get started!"}
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {contracts.map((contract) => (
-                <ContractCard
-                  key={contract.id}
-                  contract={contract}
-                  userType={isCreator ? "creator" : "brand"}
-                  onAccept={isCreator ? handleAcceptContract : undefined}
-                  onEdit={isBrand ? (c) => console.log("Edit:", c) : undefined}
-                  onView={(c) => console.log("View:", c)}
-                />
-              ))}
+              {visibleContracts.map((contract) => {
+                const isRecommended =
+                  isCreator && recommendedIds.has(contract.id);
+
+                if (isRecommended) {
+                  return (
+                    <div key={contract.id} className="relative">
+                      <div className="absolute -top-2 -left-2 z-10 flex items-center gap-1 bg-[var(--secondary-200)] text-[var(--background-700)] text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
+                        <AutoAwesomeIcon style={{ fontSize: 10 }} />
+                        Zane Pick
+                        {contract.similarity_score !== undefined && (
+                          <span className="opacity-70 ml-0.5">
+                            {Math.round(contract.similarity_score * 100)}%
+                          </span>
+                        )}
+                      </div>
+                      <div className="rounded-xl border-2 border-[var(--secondary-200)] overflow-hidden">
+                        <ContractCard
+                          contract={contract}
+                          userType="creator"
+                          onAccept={handleAcceptContract}
+                          onView={(c) => console.log("View:", c)}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <ContractCard
+                    key={contract.id}
+                    contract={contract}
+                    userType={isCreator ? "creator" : "brand"}
+                    onAccept={isCreator ? handleAcceptContract : undefined}
+                    onEdit={
+                      isBrand ? (c) => console.log("Edit:", c) : undefined
+                    }
+                    onView={(c) => console.log("View:", c)}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

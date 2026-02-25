@@ -5,6 +5,7 @@ import CampaignIcon from "@mui/icons-material/Campaign";
 import PaidIcon from "@mui/icons-material/Paid";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
+import PersonIcon from "@mui/icons-material/Person";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
 import { api } from "../../services/api";
@@ -64,8 +65,7 @@ export const Navigation: React.FC = () => {
   };
 
   const handleViewDetails = () => {
-    // Placeholder function - doesn't do anything yet
-    console.log("View Details clicked");
+    navigate("/profile");
     setIsDropdownOpen(false);
   };
 
@@ -118,6 +118,12 @@ export const Navigation: React.FC = () => {
             icon: <PaidIcon fontSize="small" />,
             path: "/earnings",
           },
+          {
+            id: "profile",
+            name: "Profile",
+            icon: <PersonIcon fontSize="small" />,
+            path: "/profile",
+          },
         ]
       : [
           {
@@ -143,6 +149,12 @@ export const Navigation: React.FC = () => {
             name: "Payouts",
             icon: <CreditCardIcon fontSize="small" />,
             path: "/payouts",
+          },
+          {
+            id: "profile",
+            name: "Profile",
+            icon: <PersonIcon fontSize="small" />,
+            path: "/profile",
           },
         ];
 

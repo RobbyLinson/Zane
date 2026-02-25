@@ -7,6 +7,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { Contracts } from "./pages/Contracts";
 import { Campaigns } from "./pages/Campaigns";
 import { Payouts } from "./pages/Payouts";
+import { Profile } from "./pages/Profile";
 import { Navigation } from "./components/layout/Navigation";
 import { Landing } from "./pages/Landing";
 
@@ -76,6 +77,7 @@ function App() {
           <Route path="/campaigns" element={<Campaigns />} />
           <Route path="/earnings" element={<Payouts />} />
           <Route path="/payouts" element={<Payouts />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Route>
 
