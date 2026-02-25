@@ -51,6 +51,13 @@ const requireUserType = (userType) => {
     try {
       const user = await User.findByPk(req.user.userId);
       if (user.user_type !== userType) {
+        console.warn("[AUTH_ROLE_MISMATCH]", {
+          method: req.method,
+          path: req.originalUrl,
+          requiredRole: userType,
+          actualRole: user.user_type,
+          userId: req.user.userId,
+        });
         return res.status(403).json({
           error: `This endpoint requires ${userType} access`,
         });

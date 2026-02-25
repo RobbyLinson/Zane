@@ -3,6 +3,7 @@ const {
   createContract,
   getContracts,
   getNumAvailableContracts,
+  getRecommendedContracts,
   getContract,
   updateContract,
   acceptContract,
@@ -17,7 +18,9 @@ router.use(authenticateToken);
 // Get contracts (different views for brands vs creators)
 router.get("/", getContracts);
 
+// Static routes MUST come before /:id to prevent param capture
 router.get("/available/count", getNumAvailableContracts);
+router.get("/recommended", requireUserType("creator"), getRecommendedContracts);
 
 // Get single contract
 router.get("/:id", getContract);

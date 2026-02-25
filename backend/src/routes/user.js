@@ -3,6 +3,7 @@ const {
   getStripeOnboardingLink,
   getEarnings,
   withdrawUserBalance,
+  updateProfile,
 } = require("../controllers/user");
 const { authenticateToken, requireUserType } = require("../middleware/auth");
 
@@ -14,5 +15,6 @@ router.use(authenticateToken);
 router.get("/stripe-onboarding-link", requireUserType("creator"), getStripeOnboardingLink);
 router.get("/earnings", requireUserType("creator"), getEarnings);
 router.post("/withdraw", requireUserType("creator"), withdrawUserBalance);
+router.put("/profile", updateProfile);
 
 module.exports = router;

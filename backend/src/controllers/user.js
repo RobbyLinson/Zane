@@ -2,6 +2,7 @@ const Stripe = require("stripe");
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const { User, Campaign, Contract } = require("../models");
 const { generateStripeOnboardingLink } = require("../services/stripe");
+const { generateEmbedding } = require("../services/embedding");
 
 const getStripeOnboardingLink = async (req, res) => {
   try {
@@ -149,8 +150,47 @@ const withdrawUserBalance = async (req, res) => {
   }
 };
 
+// PUT /user/profile — update profile fields; generates about_me_embedding for creators
+const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    const updates = {};
+
+    if (user.user_type === "creator") {
+      const { about_me } = req.body;
+      if (about_me !== undefined) {
+        updates.about_me = about_me;
+        updates.about_me_embedding = about_me.trim()
+          ? await generateEmbedding(about_me)
+          : null;
+      }
+    } else {
+      const { company_name } = req.body;
+      if (company_name !== undefined) {
+        updates.company_name = company_name;
+      }
+    }
+
+    await user.update(updates);
+
+    const updated = await User.findByPk(req.user.userId, {
+      attributes: { exclude: ["password"] },
+    });
+
+    res.json({ user: updated });
+  } catch (err) {
+    console.error("Update profile error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};
+
 module.exports = {
   getStripeOnboardingLink,
   getEarnings,
   withdrawUserBalance,
+  updateProfile,
 };

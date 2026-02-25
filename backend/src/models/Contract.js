@@ -21,29 +21,27 @@ const Contract = sequelize.define(
       type: DataTypes.STRING,
       allowNull: false,
     },
+    // Required: used as the primary text for semantic embedding + creator display
     description: {
       type: DataTypes.TEXT,
+      allowNull: false,
+    },
+    // 384-dim float array (Xenova/all-MiniLM-L6-v2); populated on create/update
+    description_embedding: {
+      type: DataTypes.JSONB,
       allowNull: true,
     },
     cpm_rate: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false, // Rate per 1000 views in euros
+      allowNull: false,
     },
     max_payout: {
       type: DataTypes.DECIMAL(10, 2),
-      allowNull: false, // Maximum total payout
+      allowNull: false,
     },
     min_views: {
       type: DataTypes.INTEGER,
-      defaultValue: 1000, // Minimum views required
-    },
-    target_audience: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-    content_requirements: {
-      type: DataTypes.TEXT,
-      allowNull: true,
+      defaultValue: 1000,
     },
     platform: {
       type: DataTypes.ENUM("tiktok", "instagram", "youtube_shorts"),

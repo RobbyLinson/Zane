@@ -66,6 +66,14 @@ const User = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    about_me: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    about_me_embedding: {
+      type: DataTypes.JSONB,
+      allowNull: true,
+    },
   },
   {
     tableName: "users",
