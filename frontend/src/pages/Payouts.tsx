@@ -13,26 +13,18 @@ export const Payouts: React.FC = () => {
   const userId = localStorage.getItem("userId") || "currentUserId";
 
   useEffect(() => {
-    const fetchMaxPayout = async () => {
+    const fetchEarnings = async () => {
       try {
-        const response = await api.getMaxPayout();
-        setMaxPayout(response.totalMaxPayout || 0);
+        const response = await api.getEarnings();
+        setMaxPayout(response.maxPayout || 0);
+        setCurrentPayout(response.currentPayout || 0);
       } catch (err) {
         setMaxPayout(0);
-        console.error("Failed to load max payout:", err);
-      }
-    };
-    const fetchCurrentPayout = async () => {
-      try {
-        const response = await api.getCurrentPayout();
-        setCurrentPayout(response.totalCurrentPayout || 0);
-      } catch (err) {
         setCurrentPayout(0);
-        console.error("Failed to load max payout:", err);
+        console.error("Failed to load earnings:", err);
       }
     };
-    fetchMaxPayout();
-    fetchCurrentPayout();
+    fetchEarnings();
   }, [userId, withdrawn]);
 
   const handleWithdraw = async () => {

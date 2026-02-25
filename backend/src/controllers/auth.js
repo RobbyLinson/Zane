@@ -126,7 +126,9 @@ const login = async (req, res) => {
 // Get current user profile
 const getProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.userId);
+    const user = await User.findByPk(req.user.userId, {
+      attributes: { exclude: ["password"] },
+    });
     if (!user) {
       return res.status(404).json({
         error: "User not found",
@@ -134,7 +136,7 @@ const getProfile = async (req, res) => {
     }
 
     res.json({
-      user: user.toJSON(),
+      user,
     });
   } catch (error) {
     console.error("Profile error:", error);

@@ -35,7 +35,8 @@ class ApiService {
     }
   }
 
-  // Auth methods
+  // ── Auth ────────────────────────────────────────────────────────────────────
+
   async register(userData: RegisterData) {
     return this.request("/auth/register", {
       method: "POST",
@@ -54,6 +55,8 @@ class ApiService {
     return this.request("/auth/profile");
   }
 
+  // ── Contracts ───────────────────────────────────────────────────────────────
+
   async getContracts(params?: {
     status?: string;
     platform?: string;
@@ -68,34 +71,17 @@ class ApiService {
         }
       });
     }
-
     const query = searchParams.toString() ? `?${searchParams.toString()}` : "";
     return this.request(`/contracts${query}`);
-  }
-
-  async submitTikTokContent(campaignId: string, tiktokUrl: string) {
-    return this.request(`/tiktok/campaigns/${campaignId}/submit-content`, {
-      method: "POST",
-      body: JSON.stringify({ tiktokUrl }),
-    });
-  }
-
-  async updateAllTikTokCampaignViews() {
-    return this.request("/tiktok/campaigns/update-all-views", {
-      method: "PUT",
-    });
-  }
-
-  async authenticateTiktokAccount() {
-    return this.request("/tiktok/auth");
   }
 
   async getContract(id: string) {
     return this.request(`/contracts/${id}`);
   }
 
-  async getNumAvailableContracts() {
-    return this.request("/contracts/countAvailable");
+  /** Returns { count } — number of active contracts still open to creators */
+  async getAvailableContractCount() {
+    return this.request("/contracts/available/count");
   }
 
   async createContract(contractData: CreateContractData) {
@@ -112,47 +98,25 @@ class ApiService {
     });
   }
 
+  /** Creator accepts a contract — creates and returns a Campaign */
   async acceptContract(id: string) {
     return this.request(`/contracts/${id}/accept`, {
       method: "POST",
     });
   }
 
-  // Campaigns
-  async getMyCampaigns() {
-    return this.request("/campaigns");
-  }
+  // ── Campaigns ───────────────────────────────────────────────────────────────
 
-  async getBrandCampaigns() {
+  /**
+   * Returns campaigns scoped to the current user.
+   * Creators receive their own campaigns; brands receive campaigns under their contracts.
+   */
+  async getCampaigns() {
     return this.request("/campaigns");
   }
 
   async getCampaign(id: string) {
     return this.request(`/campaigns/${id}`);
-  }
-
-  async getCampaignsByUser(userId: string) {
-    return this.request(`/campaigns/user/${userId}`);
-  }
-
-  async getCampaignCountByUser(userId: string) {
-    return this.request(`/campaigns/user/${userId}/count`);
-  }
-
-  async getMaxPayout() {
-    return this.request(`/campaigns/max-payout`);
-  }
-
-  async getCurrentPayout() {
-    return this.request(`/campaigns/current-payout`);
-  }
-
-  async createCampaign(contractId: string) {
-    // For creators to accept a contract and create a campaign
-    return this.request("/campaigns", {
-      method: "POST",
-      body: JSON.stringify({ contract_id: contractId }),
-    });
   }
 
   async updateCampaign(id: string, updates: Partial<Campaign>) {
@@ -168,16 +132,17 @@ class ApiService {
     });
   }
 
+  // ── User / Earnings ─────────────────────────────────────────────────────────
+
+  /** Returns { maxPayout, currentPayout } for the logged-in creator */
+  async getEarnings() {
+    return this.request("/user/earnings");
+  }
+
   async withdrawUserBalance(amount: number) {
-    return this.request("/campaigns/withdraw", {
+    return this.request("/user/withdraw", {
       method: "POST",
       body: JSON.stringify({ amount }),
-    });
-  }
-  async fundDraft(contractDraft: CreateContractData) {
-    return this.request("/payments/contracts/fund-draft", {
-      method: "POST",
-      body: JSON.stringify(contractDraft),
     });
   }
 
@@ -185,7 +150,38 @@ class ApiService {
     return this.request("/user/stripe-onboarding-link");
   }
 
-  // Auth helpers
+  // ── Payments ────────────────────────────────────────────────────────────────
+
+  async fundDraft(contractDraft: CreateContractData) {
+    return this.request("/payments/contracts/fund-draft", {
+      method: "POST",
+      body: JSON.stringify(contractDraft),
+    });
+  }
+
+  // ── TikTok ──────────────────────────────────────────────────────────────────
+
+  async authenticateTiktokAccount() {
+    return this.request("/tiktok/auth");
+  }
+
+  /** Submit a TikTok video URL for a campaign */
+  async submitTikTokContent(campaignId: string, tiktokUrl: string) {
+    return this.request(`/tiktok/campaigns/${campaignId}/content`, {
+      method: "POST",
+      body: JSON.stringify({ tiktokUrl }),
+    });
+  }
+
+  /** Sync view counts for all of the creator's active TikTok campaigns */
+  async syncAllTikTokViews() {
+    return this.request("/tiktok/campaigns/views/sync", {
+      method: "POST",
+    });
+  }
+
+  // ── Token helpers ───────────────────────────────────────────────────────────
+
   saveToken(token: string) {
     localStorage.setItem("token", token);
   }

@@ -17,7 +17,7 @@ router.use(authenticateToken);
 // Get contracts (different views for brands vs creators)
 router.get("/", getContracts);
 
-router.get("/countAvailable", getNumAvailableContracts);
+router.get("/available/count", getNumAvailableContracts);
 
 // Get single contract
 router.get("/:id", getContract);

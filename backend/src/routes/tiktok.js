@@ -28,9 +28,10 @@ router.get("/status", getTikTokConnectionStatus);
 router.delete("/disconnect", disconnectTikTok);
 
 // Campaign Content Management
-router.post("/campaigns/:campaignId/submit-content", submitCampaignContent);
-router.put("/campaigns/:campaignId/update-views", updateCampaignViews);
-router.put("/campaigns/update-all-views", updateAllCampaignViews);
+// Static route must come before the parameterized route to avoid /:campaignId capturing "views"
+router.post("/campaigns/views/sync", updateAllCampaignViews);
+router.post("/campaigns/:campaignId/content", submitCampaignContent);
+router.patch("/campaigns/:campaignId/views", updateCampaignViews);
 router.get("/campaigns/:campaignId/analytics", getCampaignAnalytics);
 
 module.exports = router;

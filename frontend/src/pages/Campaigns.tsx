@@ -16,12 +16,7 @@ export const Campaigns: React.FC = () => {
     const fetchCampaigns = async () => {
       setLoading(true);
       try {
-        let response;
-        if (isCreator) {
-          response = await api.getCampaignsByUser(user.id);
-        } else if (isBrand) {
-          response = await api.getBrandCampaigns(); // GET /api/campaigns
-        }
+        const response = await api.getCampaigns();
         setCampaigns(response.campaigns || []);
       } catch (err) {
         console.error("Failed to load campaigns:", err);
@@ -32,28 +27,24 @@ export const Campaigns: React.FC = () => {
     fetchCampaigns();
   }, [isCreator, isBrand]);
 
-  const handleContentSubmitted = () => {
-    // Re-fetch campaigns to update status and view tracking
+  const handleContentSubmitted = async () => {
     setLoading(true);
-    api
-      .request("/tiktok/campaigns")
-      .then((response) => setCampaigns(response.campaigns || []))
-      .catch((err) => console.error("Failed to reload campaigns:", err))
-      .finally(() => setLoading(false));
+    try {
+      const response = await api.getCampaigns();
+      setCampaigns(response.campaigns || []);
+    } catch (err) {
+      console.error("Failed to reload campaigns:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateViews = async () => {
     setLoading(true);
     try {
-      await api.updateAllTikTokCampaignViews();
-      // Re-fetch campaigns after updating views
-      if (isCreator) {
-        const response = await api.getCampaignsByUser(user.id);
-        setCampaigns(response.campaigns || []);
-      } else if (isBrand) {
-        const response = await api.getBrandCampaigns();
-        setCampaigns(response.campaigns || []);
-      }
+      await api.syncAllTikTokViews();
+      const response = await api.getCampaigns();
+      setCampaigns(response.campaigns || []);
     } catch (err) {
       console.error("Failed to update TikTok views:", err);
     } finally {

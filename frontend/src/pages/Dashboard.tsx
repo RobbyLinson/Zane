@@ -24,7 +24,7 @@ export const Dashboard: React.FC = () => {
   React.useEffect(() => {
     const fetchNumContracts = async () => {
       try {
-        const data = await api.getNumAvailableContracts();
+        const data = await api.getAvailableContractCount();
         setNumContracts(data.count || 0);
       } catch (err) {
         setNumContracts(0);
@@ -35,42 +35,29 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   React.useEffect(() => {
-    const fetchNumCampaigns = async () => {
+    const fetchCreatorStats = async () => {
       try {
-        if (user) {
-          const data = await api.getCampaignCountByUser(user.id);
-          setNumCampaigns(data.count || 0);
-        }
+        const [campaignsData, earningsData] = await Promise.all([
+          api.getCampaigns(),
+          api.getEarnings(),
+        ]);
+        setNumCampaigns(campaignsData.campaigns?.length || 0);
+        setCurrentPayout(earningsData.currentPayout || 0);
       } catch (err) {
         setNumCampaigns(0);
-        console.error("Failed to load number of campaigns:", err);
-      }
-    };
-    const fetchCurrentPayout = async () => {
-      try {
-        const response = await api.getCurrentPayout();
-        setCurrentPayout(response.totalCurrentPayout || 0);
-      } catch (err) {
         setCurrentPayout(0);
-        console.error("Failed to load max payout:", err);
+        console.error("Failed to load creator stats:", err);
       }
     };
-    fetchNumCampaigns();
-    fetchCurrentPayout();
-  }, [user]);
 
-  React.useEffect(() => {
-    const fetchNumBrandCampaigns = async () => {
+    const fetchBrandStats = async () => {
       try {
-        const data = await api.getBrandCampaigns();
+        const data = await api.getCampaigns();
         const campaigns = data.campaigns || [];
         setNumBrandCampaigns(campaigns.length);
-        // Calculate total spend (sum amount_earned from each campaign's contract)
         const totalSpend = campaigns.reduce(
           (sum: number, campaign: Campaign) => {
-            // Some campaigns may not have contract populated, so check
             if (campaign && campaign.amount_earned) {
-              console.log("amount_earned:", campaign.amount_earned);
               return sum + campaign.amount_earned;
             }
             return sum;
@@ -78,16 +65,17 @@ export const Dashboard: React.FC = () => {
           0,
         );
         setBrandPayout(totalSpend);
-        console.log(typeof brandPayout, brandPayout);
       } catch (err) {
         setNumBrandCampaigns(0);
         setBrandPayout(0);
-        console.error("Failed to load number of brand campaigns:", err);
+        console.error("Failed to load brand stats:", err);
       }
     };
-    if (user?.user_type === "brand") {
-      fetchNumBrandCampaigns();
-      // console.log("Fetched brand campaigns: ", numBrandCampaigns);
+
+    if (user?.user_type === "creator") {
+      fetchCreatorStats();
+    } else if (user?.user_type === "brand") {
+      fetchBrandStats();
     }
   }, [user]);
 
