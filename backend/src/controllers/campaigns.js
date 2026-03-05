@@ -4,7 +4,9 @@ const { Campaign, Contract, User } = require("../models");
 const getCampaigns = async (req, res) => {
   try {
     const userId = req.user.userId;
-    const userType = req.user.user_type;
+    const user = await User.findByPk(userId);
+    if (!user) return res.status(401).json({ error: "User not found" });
+    const userType = user.user_type;
 
     let campaigns;
 
@@ -75,10 +77,19 @@ const updateCampaign = async (req, res) => {
   try {
     const { id } = req.params;
     const updates = req.body;
+    const userId = req.user.userId;
 
-    const campaign = await Campaign.findByPk(id);
+    const campaign = await Campaign.findByPk(id, {
+      include: [{ model: Contract, as: "contract" }],
+    });
     if (!campaign) {
       return res.status(404).json({ error: "Campaign not found" });
+    }
+
+    const isCreator = campaign.creator_id === userId;
+    const isBrand = campaign.contract && campaign.contract.brand_id === userId;
+    if (!isCreator && !isBrand) {
+      return res.status(403).json({ error: "Access denied" });
     }
 
     await campaign.update(updates);
@@ -93,10 +104,21 @@ const updateCampaign = async (req, res) => {
 const deleteCampaign = async (req, res) => {
   try {
     const { id } = req.params;
-    const campaign = await Campaign.findByPk(id);
+    const userId = req.user.userId;
+
+    const campaign = await Campaign.findByPk(id, {
+      include: [{ model: Contract, as: "contract" }],
+    });
     if (!campaign) {
       return res.status(404).json({ error: "Campaign not found" });
     }
+
+    const isCreator = campaign.creator_id === userId;
+    const isBrand = campaign.contract && campaign.contract.brand_id === userId;
+    if (!isCreator && !isBrand) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+
     await campaign.destroy();
     res.json({ message: "Campaign deleted" });
   } catch (error) {

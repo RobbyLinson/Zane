@@ -57,8 +57,12 @@ const Contract = sequelize.define(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("active", "paused", "completed", "cancelled"),
+      type: DataTypes.ENUM("draft", "active", "paused", "completed", "cancelled"),
       defaultValue: "active",
+    },
+    stripe_payment_intent_id: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     expires_at: {
       type: DataTypes.DATE,

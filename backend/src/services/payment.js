@@ -10,8 +10,9 @@ class PaymentService {
   }
 
   /**
-   * Step 1: Fund a contract (escrow)
-   * Charge company_charge, set aside max_payout for creator.
+   * Step 1: Fund a contract (escrow).
+   * Creates the Contract record in "draft" status, then creates a PaymentIntent.
+   * The webhook (payment_intent.succeeded) activates the contract to "active".
    */
   async fundContractDraft(contractDraft, brandId) {
     const companyCharge = parseFloat(contractDraft.company_charge);
@@ -22,33 +23,55 @@ class PaymentService {
     const maxPayout = companyCharge - platformFee;
 
     const user = await User.findByPk(brandId);
-
     const stripeCustomerId = user.stripe_account_id;
 
-    console.log("Customer ID:", stripeCustomerId);
     if (!stripeCustomerId) {
       throw new Error("Brand has no Stripe customer ID");
     }
-    console.log(`creating payment intent for customer ${stripeCustomerId}`);
-    // Create PaymentIntent for the full contract charge
+
+    // Create the contract as a draft so the webhook can find and activate it
+    const { generateEmbedding } = require("../services/embedding");
+    const description_embedding = contractDraft.description
+      ? await generateEmbedding(contractDraft.description)
+      : null;
+
+    const contract = await Contract.create({
+      brand_id: brandId,
+      title: contractDraft.title,
+      description: contractDraft.description,
+      description_embedding,
+      cpm_rate: contractDraft.cpm_rate,
+      max_payout: contractDraft.max_payout,
+      min_views: contractDraft.min_views || 1000,
+      platform: contractDraft.platform || "tiktok",
+      company_charge: companyCharge,
+      num_campaigns: contractDraft.num_campaigns || 1,
+      expires_at: contractDraft.expires_at ? new Date(contractDraft.expires_at) : null,
+      status: "draft",
+    });
+
+    // Create PaymentIntent, storing the contract ID in metadata for the webhook
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(companyCharge * 100), // in cents
+      amount: Math.round(companyCharge * 100),
       currency: "usd",
       customer: stripeCustomerId,
       metadata: {
         type: "contract_funding_draft",
         brand_id: brandId,
+        contract_id: contract.id,
         title: contractDraft.title,
       },
     });
 
-    // Optionally: Store a temporary record if you want to track drafts
+    // Store the payment intent ID on the contract so the webhook can look it up
+    await contract.update({ stripe_payment_intent_id: paymentIntent.id });
 
     return {
       paymentIntent: {
         id: paymentIntent.id,
         client_secret: paymentIntent.client_secret,
       },
+      contractId: contract.id,
       platformFee,
       maxPayout,
     };
@@ -161,7 +184,7 @@ class PaymentService {
     if (!payout) {
       throw new Error("Payout not found");
     }
-    if (!payout.user.stripe_connect_account_id) {
+    if (!payout.user.stripe_account_id) {
       throw new Error("Creator has no Stripe Connect account");
     }
 
@@ -172,7 +195,7 @@ class PaymentService {
       const transfer = await stripe.transfers.create({
         amount: Math.round(parseFloat(payout.amount) * 100),
         currency: payout.currency,
-        destination: payout.user.stripe_connect_account_id,
+        destination: payout.user.stripe_account_id,
       });
 
       await payout.update({

@@ -1,15 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const helmet = require("helmet");
+const morgan = require("morgan");
+const rateLimit = require("express-rate-limit");
 const { testConnection, initDatabase } = require("./utils/database");
 const { User, Contract } = require("./models");
 const { generateEmbedding } = require("./services/embedding");
+const { authenticateToken } = require("./middleware/auth");
 require("dotenv").config();
 
 const app = express();
 
 // Middleware
 app.use(helmet());
+app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 const ALLOWED_ORIGINS = [
   "http://localhost:5173",
   "http://localhost:3000",
@@ -33,6 +37,9 @@ app.use(
     credentials: true,
   })
 );
+// Webhook route must be registered before express.json() — needs raw body for signature verification
+app.use("/api/webhooks", require("./routes/webhooks"));
+
 app.use(express.json());
 
 // Backfill embeddings for any seeded rows that are missing them
@@ -70,8 +77,8 @@ app.get("/api/health", (req, res) => {
   res.json({ status: "OK", message: "CPM Tool API is running" });
 });
 
-// Dev utility — regenerate missing embeddings on demand
-app.post("/api/admin/seed-embeddings", async (_req, res) => {
+// Admin utility — regenerate missing embeddings on demand (auth required)
+app.post("/api/admin/seed-embeddings", authenticateToken, async (_req, res) => {
   try {
     const result = await seedEmbeddings();
     res.json({ message: "Embeddings seeded", ...result });
@@ -81,7 +88,27 @@ app.post("/api/admin/seed-embeddings", async (_req, res) => {
   }
 });
 
+// Rate limiting
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10,
+  message: { error: "Too many attempts, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: "Too many requests, please try again later" },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // Auth routes
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api", apiLimiter);
 app.use("/api/auth", require("./routes/auth"));
 
 app.use("/api/contracts", require("./routes/contracts"));

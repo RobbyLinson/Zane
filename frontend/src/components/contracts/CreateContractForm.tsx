@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Elements } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { api } from "../../services/api";
 import type { CreateContractData } from "../../types";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import CampaignIcon from "@mui/icons-material/Campaign";
@@ -114,19 +113,9 @@ export const CreateContractForm: React.FC<CreateContractFormProps> = ({
     }
   };
 
-  const handleFundSuccess = async () => {
-    setLoading(true);
-    try {
-      await api.createContract(formData);
-      setShowFundModal(false);
-      onSuccess();
-    } catch (err: unknown) {
-      setError(
-        err instanceof Error ? err.message : "Failed to create contract",
-      );
-    } finally {
-      setLoading(false);
-    }
+  const handleFundSuccess = () => {
+    setShowFundModal(false);
+    onSuccess();
   };
 
   const maxViews =

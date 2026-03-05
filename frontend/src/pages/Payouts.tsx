@@ -58,7 +58,7 @@ export const Payouts: React.FC = () => {
               Maximum Possible Earnings
             </span>
             <span className="text-xl font-semibold text-[var(--text-50)]">
-              €{maxPayout.toFixed(2)}
+              ${maxPayout.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center mb-4">
@@ -70,7 +70,7 @@ export const Payouts: React.FC = () => {
               Currently Available
             </span>
             <span className="text-xl font-semibold text-[var(--primary-500)]">
-              €{currentPayout.toFixed(2)}
+              ${currentPayout.toFixed(2)}
             </span>
           </div>
           <button

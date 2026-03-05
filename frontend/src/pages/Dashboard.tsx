@@ -18,6 +18,7 @@ export const Dashboard: React.FC = () => {
   const [numContracts, setNumContracts] = React.useState<number>(0);
   const [numCampaigns, setNumCampaigns] = React.useState<number>(0);
   const [currentPayout, setCurrentPayout] = React.useState<number>(0);
+  const [numBrandContracts, setNumBrandContracts] = React.useState<number>(0);
   const [numBrandCampaigns, setNumBrandCampaigns] = React.useState<number>(0);
   const [brandPayout, setBrandPayout] = React.useState<number>(0);
 
@@ -52,9 +53,13 @@ export const Dashboard: React.FC = () => {
 
     const fetchBrandStats = async () => {
       try {
-        const data = await api.getCampaigns();
-        const campaigns = data.campaigns || [];
+        const [campaignsData, contractsData] = await Promise.all([
+          api.getCampaigns(),
+          api.getContracts(),
+        ]);
+        const campaigns = campaignsData.campaigns || [];
         setNumBrandCampaigns(campaigns.length);
+        setNumBrandContracts(contractsData.contracts?.length || 0);
         const totalSpend = campaigns.reduce(
           (sum: number, campaign: Campaign) => {
             if (campaign && campaign.amount_earned) {
@@ -116,7 +121,7 @@ export const Dashboard: React.FC = () => {
   const brandStats = [
     {
       title: "Active Contracts",
-      value: numContracts !== null ? numContracts.toString() : "...",
+      value: numBrandContracts.toString(),
       color: "var(--primary-500)",
       icon: (
         <AssignmentIcon
