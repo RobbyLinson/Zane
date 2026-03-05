@@ -26,7 +26,11 @@ app.use(
       // Allow requests with no origin (mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
       // Allow any ngrok tunnel (used for local development sharing)
-      if (origin.endsWith(".ngrok-free.app") || origin.endsWith(".ngrok-free.dev") || origin.endsWith(".ngrok.io")) {
+      if (
+        origin.endsWith(".ngrok-free.app") ||
+        origin.endsWith(".ngrok-free.dev") ||
+        origin.endsWith(".ngrok.io")
+      ) {
         return callback(null, true);
       }
       if (ALLOWED_ORIGINS.includes(origin)) {
@@ -35,37 +39,47 @@ app.use(
       callback(new Error(`CORS: origin '${origin}' not allowed`));
     },
     credentials: true,
-  })
+  }),
 );
 // Webhook route must be registered before express.json() — needs raw body for signature verification
 app.use("/api/webhooks", require("./routes/webhooks"));
 
 app.use(express.json());
 
-// Backfill embeddings for any seeded rows that are missing them
 const seedEmbeddings = async () => {
+  console.log("⏳ Seeding missing vector embeddings...");
   let contracts = 0;
   let users = 0;
 
-  const contractsToEmbed = await Contract.findAll({ where: { description_embedding: null } });
+  const contractsToEmbed = await Contract.findAll({
+    where: { description_embedding: null },
+  });
   for (const c of contractsToEmbed) {
-    await c.update({ description_embedding: await generateEmbedding(c.description) });
+    await c.update({
+      description_embedding: await generateEmbedding(c.description),
+    });
     contracts++;
   }
 
-  const usersToEmbed = await User.findAll({ where: { about_me_embedding: null } });
+  const usersToEmbed = await User.findAll({
+    where: { about_me_embedding: null },
+  });
   for (const u of usersToEmbed) {
     if (u.about_me) {
-      await u.update({ about_me_embedding: await generateEmbedding(u.about_me) });
+      await u.update({
+        about_me_embedding: await generateEmbedding(u.about_me),
+      });
       users++;
     }
   }
 
-  console.log(`✅ Embeddings seeded — contracts: ${contracts}, users: ${users}`);
+  console.log(
+    `✅ Embeddings seeded — contracts: ${contracts}, users: ${users}`,
+  );
   return { contracts, users };
 };
 
-// Test database on startup
+// Test database on startup, then run the embedding seeder
 testConnection().then((success) => {
   if (success) {
     initDatabase().then(() => seedEmbeddings().catch(console.error));

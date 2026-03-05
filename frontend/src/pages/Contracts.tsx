@@ -46,7 +46,7 @@ export const Contracts: React.FC = () => {
       const [contractsRes, recommendedRes] = await Promise.all([
         api.getContracts(filters),
         isCreator && user?.about_me
-          ? api.getRecommendedContracts()
+          ? api.getRecommendedContracts().catch(() => ({ contracts: [] }))
           : Promise.resolve({ contracts: [] }),
       ]);
 
