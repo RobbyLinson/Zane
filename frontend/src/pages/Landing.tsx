@@ -86,7 +86,7 @@ export const Landing: React.FC = () => {
                   </div>
                   <CardTitle>Fraud-Protected Views</CardTitle>
                   <CardDescription className="text-white/70">
-                    Our multi-lawyer verification ensures you only pay for
+                    Our multi-layer verification ensures you only pay for
                     genuine, human views.
                   </CardDescription>
                 </CardHeader>
