@@ -20,9 +20,7 @@ import {
 import { Button } from "../ui/button";
 import { FundContractForm } from "./FundContract";
 
-const stripePromise = loadStripe(
-  "pk_test_51S5Sp6DGlKLv8jZbbpa0BwpoyPfAYVgn0zjGzEDmlrRqBbiituzNro2xOtnx9z2RMqhRymUOzKZmsXyDhCOE8kNS00yYTnZgUO",
-);
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const PLATFORMS = [
   {

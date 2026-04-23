@@ -227,7 +227,6 @@ export const Contracts: React.FC = () => {
                           contract={contract}
                           userType="creator"
                           onAccept={handleAcceptContract}
-                          onView={(c) => console.log("View:", c)}
                         />
                       </div>
                     </div>
@@ -240,10 +239,6 @@ export const Contracts: React.FC = () => {
                     contract={contract}
                     userType={isCreator ? "creator" : "brand"}
                     onAccept={isCreator ? handleAcceptContract : undefined}
-                    onEdit={
-                      isBrand ? (c) => console.log("Edit:", c) : undefined
-                    }
-                    onView={(c) => console.log("View:", c)}
                   />
                 );
               })}

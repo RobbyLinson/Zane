@@ -114,7 +114,7 @@ export const Dashboard: React.FC = () => {
       value: `€${currentPayout.toFixed(2)}`,
       color: "var(--text-50)",
       icon: <PaidIcon fontSize="medium" style={{ color: "var(--text-50)" }} />,
-      action: () => navigate("/earnings"),
+      action: () => navigate("/payouts"),
     },
   ];
 
@@ -203,52 +203,7 @@ export const Dashboard: React.FC = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-[var(--background-700)] shadow rounded-lg p-6">
-            <h3 className="text-lg font-medium text-[var(--text-100)] mb-4">
-              {user?.user_type === "creator"
-                ? "Recent Opportunities"
-                : "Recent Activity"}
-            </h3>
-            {/* <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div
-                  key={i}
-                  className="flex items-center space-x-3 p-3 bg-[var(--background-600)] rounded-lg"
-                >
-                  <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-[var(--primary-500)] rounded-full flex items-center justify-center">
-                      <DashboardIcon
-                        fontSize="small"
-                        style={{ color: "#fff" }}
-                      />
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-[var(--text-100)]">
-                      {user?.user_type === "creator"
-                        ? `New contract: Skincare product promotion`
-                        : `Creator accepted: Fitness campaign`}
-                    </p>
-                    <p className="text-xs text-[var(--text-300)]">
-                      2 hours ago
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={() =>
-                navigate(
-                  user?.user_type === "creator" ? "contracts" : "campaigns"
-                )
-              }
-              className="mt-4 text-sm text-[var(--secondary-200)] hover:text-[var(--primary-500)] font-medium"
-            >
-              View all →
-            </button> */}
-          </div>
-
+        <div className="grid grid-cols-1 gap-6">
           <div className="bg-[var(--background-700)] shadow rounded-lg p-6">
             <h3 className="text-lg font-medium text-[var(--text-100)] mb-4">
               Quick Actions

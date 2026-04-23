@@ -12,10 +12,10 @@ import { Navigation } from "./components/layout/Navigation";
 import { Landing } from "./pages/Landing";
 
 const LoadingScreen: React.FC = () => (
-  <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+  <div className="min-h-screen bg-gradient-to-br from-[var(--primary-700)] to-[var(--secondary-700)] flex items-center justify-center">
     <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
-      <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[var(--primary-500)] mx-auto"></div>
+      <p className="mt-4 text-[var(--text-300)]">Loading...</p>
     </div>
   </div>
 );
@@ -40,7 +40,7 @@ const RequireAuth: React.FC = () => {
 };
 
 const PrivateLayout: React.FC = () => (
-  <div className="min-h-screen bg-gray-50">
+  <div className="min-h-screen bg-gradient-to-br from-[var(--primary-700)] to-[var(--secondary-700)]">
     <Navigation />
     <main>
       <Outlet />

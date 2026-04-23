@@ -93,7 +93,6 @@ export const Campaigns: React.FC = () => {
                   key={campaign.id}
                   campaign={campaign}
                   userType={isCreator ? "creator" : "brand"}
-                  onView={(c) => console.log("View campaign:", c)}
                   onContentSubmitted={handleContentSubmitted}
                 />
               ))}

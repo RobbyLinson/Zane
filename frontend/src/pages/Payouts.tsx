@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../services/api";
+import { useAuth } from "../contexts/AuthContext";
 import PaidIcon from "@mui/icons-material/Paid";
 import CreditCardIcon from "@mui/icons-material/CreditCard";
 
 export const Payouts: React.FC = () => {
+  const { user } = useAuth();
   const [maxPayout, setMaxPayout] = useState<number>(0);
   const [currentPayout, setCurrentPayout] = useState<number>(0);
   const [isWithdrawing, setIsWithdrawing] = useState(false);
   const [withdrawn, setWithdrawn] = useState(false);
-
-  // Replace this with your actual user ID logic
-  const userId = localStorage.getItem("userId") || "currentUserId";
 
   useEffect(() => {
     const fetchEarnings = async () => {
@@ -25,7 +24,7 @@ export const Payouts: React.FC = () => {
       }
     };
     fetchEarnings();
-  }, [userId, withdrawn]);
+  }, [user?.id, withdrawn]);
 
   const handleWithdraw = async () => {
     setIsWithdrawing(true);
@@ -58,7 +57,7 @@ export const Payouts: React.FC = () => {
               Maximum Possible Earnings
             </span>
             <span className="text-xl font-semibold text-[var(--text-50)]">
-              ${maxPayout.toFixed(2)}
+              €{maxPayout.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between items-center mb-4">
@@ -70,7 +69,7 @@ export const Payouts: React.FC = () => {
               Currently Available
             </span>
             <span className="text-xl font-semibold text-[var(--primary-500)]">
-              ${currentPayout.toFixed(2)}
+              €{currentPayout.toFixed(2)}
             </span>
           </div>
           <button
