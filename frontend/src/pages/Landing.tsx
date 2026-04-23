@@ -32,7 +32,7 @@ function useReveal(threshold = 0.12) {
           obs.disconnect();
         }
       },
-      { threshold }
+      { threshold },
     );
     obs.observe(el);
     return () => obs.disconnect();
