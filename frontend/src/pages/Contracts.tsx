@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { api } from "../services/api";
@@ -15,8 +15,10 @@ export const Contracts: React.FC = () => {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [recommended, setRecommended] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMessage, setLoadingMessage] = useState("Loading contracts...");
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [filters, setFilters] = useState({ platform: "", status: "" });
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const isCreator = user?.user_type === "creator";
   const isBrand = user?.user_type === "brand";
@@ -36,6 +38,16 @@ export const Contracts: React.FC = () => {
   const loadContracts = async () => {
     try {
       setLoading(true);
+      if (isCreator) {
+        setLoadingMessage("Analysing your content profile...");
+        if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = setTimeout(
+          () => setLoadingMessage("Finding your best matches..."),
+          800,
+        );
+      } else {
+        setLoadingMessage("Loading contracts...");
+      }
       debugLog("loadContracts:start", {
         userId: user?.id,
         userType: user?.user_type,
@@ -62,6 +74,7 @@ export const Contracts: React.FC = () => {
       console.error("Failed to load contracts:", err);
       debugLog("loadContracts:error", err);
     } finally {
+      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
       setLoading(false);
       debugLog("loadContracts:done");
     }
@@ -71,7 +84,7 @@ export const Contracts: React.FC = () => {
     debugLog("filters changed", filters);
     loadContracts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filters]);
+  }, [filters, user?.id]);
 
   useEffect(() => {
     debugLog("state snapshot", {
@@ -202,8 +215,15 @@ export const Contracts: React.FC = () => {
 
           {/* Contracts list */}
           {loading ? (
-            <div className="text-center text-[var(--text-300)]">
-              Loading contracts...
+            <div className="flex items-center justify-center gap-2 text-[var(--text-300)]">
+              {isCreator && (
+                <AutoAwesomeIcon
+                  fontSize="small"
+                  style={{ color: "var(--secondary-200)" }}
+                  className="animate-pulse"
+                />
+              )}
+              {loadingMessage}
             </div>
           ) : visibleContracts.length === 0 ? (
             <div className="text-center text-[var(--text-300)]">
