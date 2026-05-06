@@ -143,23 +143,18 @@ export const Landing: React.FC = () => {
 
       {/* Hero */}
       <section className="container mx-auto px-6 pt-24 pb-20 text-center text-white">
-        <div style={{ animation: "fadeUp 0.6s ease both" }}>
-          <span className="inline-block px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-sm text-white/80 mb-6 backdrop-blur-sm">
-            CPM-based influencer marketing, reimagined
-          </span>
-        </div>
         <h1
           className="text-5xl md:text-7xl font-bold mb-6 leading-tight"
           style={{ animation: "fadeUp 0.6s ease 100ms both" }}
         >
-          Real Views. Fair Pay.
+          Book a creator in minutes.
         </h1>
         <p
           className="text-xl md:text-2xl mb-10 text-white/80 max-w-2xl mx-auto leading-relaxed"
           style={{ animation: "fadeUp 0.6s ease 200ms both" }}
         >
-          The CPM network that replaces flat-fee guesswork with fraud-proof
-          views for brands — and gets creators paid more, faster.
+          Guaranteed fraud-proof reach for games, music, and live events. No
+          flat fees. No guesswork.
         </p>
         <div
           className="flex flex-col sm:flex-row gap-4 justify-center"
@@ -292,7 +287,7 @@ export const Landing: React.FC = () => {
                 <Button
                   asChild
                   size="lg"
-                  className="bg-[var(--accent-500)] hover:bg-[var(--accent-600)] text-white mt-2"
+                  className="bg-white text-[var(--primary-700)] hover:bg-white/90 mt-2"
                 >
                   <Link to="/auth/register/brand">
                     Start a Campaign or Get a Demo{" "}
