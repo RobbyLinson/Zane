@@ -308,6 +308,7 @@ export const Landing: React.FC = () => {
                   size="lg"
                   className="bg-white text-[var(--primary-700)] hover:bg-white/90 mt-2"
                 >
+                  <Link to="/auth/register/creator">
                     Join the Network <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
