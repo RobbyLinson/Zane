@@ -303,12 +303,11 @@ export const Landing: React.FC = () => {
                   Get paid for every 1,000 real views. Automatically. No
                   negotiations needed.
                 </p>
-                <Button
+               <Button
                   asChild
                   size="lg"
-                  className="bg-white/10 hover:bg-white/20 border border-white/30 text-white mt-2 backdrop-blur-sm"
+                  className="bg-white text-[var(--primary-700)] hover:bg-white/90 mt-2"
                 >
-                  <Link to="/auth/register/creator">
                     Join the Network <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
